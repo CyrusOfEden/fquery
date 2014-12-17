@@ -1,0 +1,22 @@
+{
+  "name": "query",
+  "version": "0.0.1",
+  "authors": [
+    "Kash Nouroozi <knouroozi@gmail.com>"
+  ],
+  "description": "A functional approach to DOM manipulation.",
+  "main": "dist/query.js",
+  "moduleType": [
+    "amd",
+    "es6",
+    "globals"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
