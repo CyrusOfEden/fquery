@@ -1,3 +1,7 @@
+query.matchNode = _.curry(function(node, test) {
+  return node === test;
+});
+
 query.attrEqual = _.curry(function(attr, value, node) {
   return query.getAttr(attr, node) === value;
 });
