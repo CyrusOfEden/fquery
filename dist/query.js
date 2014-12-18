@@ -17,23 +17,49 @@
     var query = {},
         utils = {};
 
+var f = (function() {
+  function f(object) {
+    this.wrapped = true;
+    this.value = object;
+    this.events = {};
+  }
+
+  f.prototype.valueOf = function() {
+    return this.value;
+  }
+
+  return f;
+})();
+
+query.wrap = function(object) {
+  return new f(object);
+};
+
+query.unwrap = function(f) {
+  return f.value;
+};
 query.array = function(array) {
   return _.isArray(array) ? array : [array];
 };
 
-query.wrap = function(object) {
-  return {
-    wrapped: true,
-    value: object,
-    valueOf: function() {
-      return this.value;
-    }
-  };
-};
+query.createEvent = _.curry(function(name, data) {
+  return { name: name, data: data };
+});
 
-query.unwrap = function(object) {
-  return object.value;
-};
+query.watch = _.curry(function(event, callback, node) {
+  node = query.node(node);
+  query.unwrap(node).addEventListener(event, callback);
+  return node;
+});
+
+query.unwatch = _.curry(function(event, callback, node) {
+  node = query.node(node);
+  query.unwrap(node).removeEventListener(event, callback);
+  return node;
+});
+
+query.ready = _.partial(document.addEventListener)('DOMContentLoaded');
+
 (function(funcs) {
   _.forEach(funcs, function(func) {
     query[func] = _.curry(function(callback, list) {
@@ -81,6 +107,18 @@ query.parent = function(list) {
     })
   );
 };
+(function() {
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+   }
+
+  CustomEvent.prototype = window.Event.prototype;
+
+  window.CustomEvent = CustomEvent;
+})();
 // Attributes
 query.getAttr = _.curry(function(attr, node) {
   return query.unwrap(query.node(node)).getAttribute(attr);
