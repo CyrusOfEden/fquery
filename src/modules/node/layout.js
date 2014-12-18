@@ -1,8 +1,8 @@
-// Rendering
+// Layout
 query.offset = function(node) {
   node = query.node(node);
   var rect = query.unwrap(node).getBoundingClientRect();
-  
+
   return {
     top: rect.top + document.body.scrollTop,
     left: rect.left + document.body.scrollLeft
