@@ -17,14 +17,23 @@
     var query = {},
         utils = {};
 
-query.list = function(selector) {
-  if (selector.wrapped) return selector;
-
-  return query.wrap(
-    _.isArray(selector) ? selector : _.toArray(document.querySelectorAll(selector))
-  );
+query.array = function(array) {
+  return _.isArray(array) ? array : [array];
 };
 
+query.wrap = function(object) {
+  return {
+    wrapped: true,
+    value: object,
+    valueOf: function() {
+      return this.value;
+    }
+  };
+};
+
+query.unwrap = function(object) {
+  return object.value;
+};
 (function(funcs) {
   _.forEach(funcs, function(func) {
     query[func] = _.curry(function(callback, list) {
@@ -45,46 +54,14 @@ query.list = function(selector) {
   'invoke',
   'size'
 ]);
-
-query.node = function(selector) {
+query.list = function(selector) {
   if (selector.wrapped) return selector;
 
   return query.wrap(
-    selector instanceof Element ? selector : document.querySelector(selector)
+    _.isArray(selector) ? selector : _.toArray(document.querySelectorAll(selector))
   );
 };
-
-// State
-query.isEmpty = function(node) {
-  return !!query.getText(node);
-};
-
-query.isMatch = _.curry(function(node1, node2) {
-  return node1 === node2;
-});
-
-// CSS
-query.getStyle = _.curry(function(property, node) {
-  return getComputedStyle(query.unwrap(query.node(node)))[property];
-});
-
-query.setStyle = _.curry(function(property, value, node) {
-  node = query.node(node);
-  query.unwrap(node).style[property] = value;
-  return node;
-});
-
-query.hide = function(node) {
-  return query.setStyle('display', 'none', query.node(node));
-};
-
-query.show = function(node) {
-  return query.setStyle('display', '', query.node(node));
-};
-
-// Traversal
 query.siblings = function(list) {
-  return 'todo';
 };
 
 query.children = function(list) {
@@ -104,14 +81,23 @@ query.parent = function(list) {
     })
   );
 };
+// Attributes
+query.getAttr = _.curry(function(attr, node) {
+  return query.unwrap(query.node(node)).getAttribute(attr);
+});
 
-query.remove = function(node) {
+query.setAttr = _.curry(function(attr, value, node) {
   node = query.node(node);
-  query.unwrap(node).parentNode.removeChild(query.unwrap(node));
+  query.unwrap(node).setAttribute(attr, value);
   return node;
-};
+});
 
-// Classes
+query.removeAttr = _.curry(function(attr, node) {
+  node = query.node(node);
+  query.unwrap(node).removeAttribute(attr);
+  return node;
+});
+// Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   query[func + 'Class'] = _.curry(function(klasses, node) {
     node = query.node(node);
@@ -130,24 +116,23 @@ query.hasClass = _.curry(function(klasses, node) {
     return element.classList.contains(klass);
   });
 });
-
-// Attributes
-query.getAttr = _.curry(function(attr, node) {
-  return query.unwrap(query.node(node)).getAttribute(attr);
+query.getStyle = _.curry(function(property, node) {
+  return getComputedStyle(query.unwrap(query.node(node)))[property];
 });
 
-query.setAttr = _.curry(function(attr, value, node) {
+query.setStyle = _.curry(function(property, value, node) {
   node = query.node(node);
-  query.unwrap(node).setAttribute(attr, value);
+  query.unwrap(node).style[property] = value;
   return node;
 });
 
-query.removeAttr = _.curry(function(attr, node) {
-  node = query.node(node);
-  query.unwrap(node).removeAttribute(attr);
-  return node;
-});
+query.hide = function(node) {
+  return query.setStyle('display', 'none', query.node(node));
+};
 
+query.show = function(node) {
+  return query.setStyle('display', '', query.node(node));
+};
 // Data
 query.getData = _.curry(function(attr, node) {
   return query.getAttr('data-' + attr, node);
@@ -160,18 +145,6 @@ query.setData = _.curry(function(attr, value, node) {
 query.removeData = _.curry(function(attr, node) {
   return query.removeAttr('data-' + attr, node);
 });
-
-// Text
-query.getText = function(node) {
-  return query.unwrap(query.node(node)).textContent;
-};
-
-query.setText = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).textContent = text;
-  return node;
-});
-
 // HTML
 query.getHTML = function(node) {
   return query.unwrap(query.node(node)).innerHTML;
@@ -192,25 +165,61 @@ query.setOuterHTML = _.curry(function(text, node) {
   query.unwrap(node).outerHTML = text;
   return node;
 });
-
-query.array = function(array) {
-  return _.isArray(array) ? array : [array];
+query.remove = function(node) {
+  node = query.node(node);
+  query.unwrap(node).parentNode.removeChild(query.unwrap(node));
+  return node;
 };
 
-query.wrap = function(object) {
-  return {
-    wrapped: true,
-    value: object,
-    valueOf: function() {
-      return this.value;
-    }
-  };
+query.after = _.curry(function(htmlString, node) {
+  node = query.node(node);
+  query.unwrap(node).insertAdjacentHTML('afterend', htmlString);
+  return node;
+});
+
+query.before = _.curry(function(htmlString, node) {
+  node = query.node(node);
+  query.unwrap(node).insertAdjacentHTML('beforebegin', htmlString);
+  return node;
+});
+
+query.append = _.curry(function(htmlString, node) {
+  node = query.node(node);
+  query.unwrap(node).insertAdjacentHTML('afterbegin', htmlString);
+  return node;
+});
+
+query.prepend = _.curry(function(htmlString, node) {
+  node = query.node(node);
+  query.unwrap(node).insertAdjacentHTML('beforend', htmlString);
+  return node;
+});
+query.node = function(selector) {
+  if (selector.wrapped) return selector;
+
+  return query.wrap(
+    selector instanceof Element ? selector : document.querySelector(selector)
+  );
 };
 
-query.unwrap = function(object) {
-  return object.value;
+// State
+query.isEmpty = function(node) {
+  return !!query.getText(node);
 };
 
+query.isMatch = _.curry(function(node1, node2) {
+  return node1 === node2;
+});
+// Text
+query.getText = function(node) {
+  return query.unwrap(query.node(node)).textContent;
+};
+
+query.setText = _.curry(function(text, node) {
+  node = query.node(node);
+  query.unwrap(node).textContent = text;
+  return node;
+});
 
     return query;
   }

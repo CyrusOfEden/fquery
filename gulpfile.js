@@ -8,7 +8,7 @@ var wrap = require('gulp-wrap');
 var del = require('del');
 
 var config = {
-  src: 'src/modules/*.js',
+  src: 'src/modules/**/*.js',
   dist: 'dist'
 };
 
