@@ -1,5 +1,5 @@
-query.matchNode = _.curry(function(node, test) {
-  return node === test;
+query.equal = _.curry(function(node, test) {
+  return query.unwrap(query.node(node)) === query.unwrap(query.node(test));
 });
 
 query.attrEqual = _.curry(function(attr, value, node) {
