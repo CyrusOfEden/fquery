@@ -4,13 +4,13 @@ query.remove = function(node) {
   return node;
 };
 
-query.after = _.curry(function(htmlString, node) {
+query.insertAfter = _.curry(function(htmlString, node) {
   node = query.node(node);
   query.unwrap(node).insertAdjacentHTML('afterend', htmlString);
   return node;
 });
 
-query.before = _.curry(function(htmlString, node) {
+query.insertBefore = _.curry(function(htmlString, node) {
   node = query.node(node);
   query.unwrap(node).insertAdjacentHTML('beforebegin', htmlString);
   return node;
