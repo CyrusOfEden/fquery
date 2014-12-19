@@ -1,6 +1,6 @@
 (function(funcs) {
   _.forEach(funcs, function(func) {
-    f[func] = _.curry(function(callback, list) {
+    f[func] = curry(function(callback, list) {
       return _[func](f.list(list), callback);
     });
   });

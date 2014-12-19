@@ -1,4 +1,4 @@
-f.list = function(s) {
+f.list = f.l = function(s) {
   if (_.isArray(s)) {
     return s;
   } else if (s instanceof HTMLCollection || s instanceof NodeList) {

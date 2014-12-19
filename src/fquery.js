@@ -1,16 +1,6 @@
 ;(function() {
   'use strict';
 
-  // Used to determine if values are of the language type Object
-  var objectTypes = {
-    'boolean': false,
-    'function': true,
-    'object': true,
-    'number': false,
-    'string': false,
-    'undefined': false
-  };
-
   // Used as a reference to the global object
   var root = window || this;
 
@@ -26,8 +16,8 @@
 
   // some AMD build optimizers like r.js check for condition patterns like the following:
   if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-    // Expose Lo-Dash to the global object even when an AMD loader is present in
-    // case Lo-Dash is loaded with a RequireJS shim config.
+    // Expose fQuery to the global object even when an AMD loader is present in
+    // case fQuery is loaded with a RequireJS shim config.
     // See http://requirejs.org/docs/api.html#config-shim
     root.f = f;
 

@@ -4,7 +4,7 @@ function eventWatcher(func, node, event) {
   }
 }
 
-f.watch = _.curry(function(eventName, func, node) {
+f.watch = adapt(function(eventName, func, node) {
   node = f.node(node);
   func = eventWatcher(func, node);
   node.addEventListener(eventName, func);
@@ -13,7 +13,7 @@ f.watch = _.curry(function(eventName, func, node) {
   }
 });
 
-f.trigger = _.curry(function(eventName, node) {
+f.trigger = adapt(function(eventName, node) {
   node = f.node(node);
   var event = document.createEvent('HTMLEvents');
   event.initEvent(eventName, true, false);

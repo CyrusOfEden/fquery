@@ -1,19 +1,19 @@
 // HTML
-f.getHTML = function(node) {
+f.getHTML = adapt(function(node) {
   return f.node(node).innerHTML;
-};
+});
 
-f.setHTML = _.curry(function(value, node) {
+f.setHTML = adapt(function(value, node) {
   node = f.node(node);
   node.innerHTML = get(value, node);
   return node;
 });
 
-f.getOuterHTML = function(node) {
+f.getOuterHTML = adapt(function(node) {
   return f.node(node).outerHTML;
-};
+});
 
-f.setOuterHTML = _.curry(function(value, node) {
+f.setOuterHTML = adapt(function(value, node) {
   node = f.node(node);
   node.outerHTML = get(value, node);
   return node;
