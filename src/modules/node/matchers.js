@@ -23,5 +23,5 @@ query.textEqual = _.curry(function(value, node) {
 });
 
 query.textMatch = _.curry(function(regex, node) {
-  return query.getText(node).match(regex0;
+  return query.getText(node).match(regex);
 });

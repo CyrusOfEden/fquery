@@ -2,12 +2,11 @@ var f = (function() {
   function f(object) {
     this.wrapped = true;
     this.value = object;
-    this.events = {};
   }
 
-  f.prototype.valueOf = function() {
+  f.prototype.valueOf = f.prototype.toString = function() {
     return this.value;
-  }
+  };
 
   return f;
 })();

@@ -1,4 +1,5 @@
 ;(function() {
+  'use strict';
 
   // Used to determine if values are of the language type Object
   var objectTypes = {
@@ -11,11 +12,10 @@
   };
 
   // Used as a reference to the global object
-  var root = (objectTypes[typeof window] && window) || this;
+  var root = window || this;
 
   function runInContext() {
-    var query = {},
-        utils = {};
+    var query = {};
 
 <%= contents %>
 

@@ -1,4 +1,5 @@
 ;(function() {
+  'use strict';
 
   // Used to determine if values are of the language type Object
   var objectTypes = {
@@ -11,22 +12,20 @@
   };
 
   // Used as a reference to the global object
-  var root = (objectTypes[typeof window] && window) || this;
+  var root = window || this;
 
   function runInContext() {
-    var query = {},
-        utils = {};
+    var query = {};
 
 var f = (function() {
   function f(object) {
     this.wrapped = true;
     this.value = object;
-    this.events = {};
   }
 
-  f.prototype.valueOf = function() {
+  f.prototype.valueOf = f.prototype.toString = function() {
     return this.value;
-  }
+  };
 
   return f;
 })();
@@ -42,23 +41,28 @@ query.array = function(array) {
   return _.isArray(array) ? array : [array];
 };
 
-query.createEvent = _.curry(function(name, data) {
-  return { name: name, data: data };
+query.buildEventCallback = _.curry(function(callback, node, event) {
+  return callback(node, event);
 });
 
-query.watch = _.curry(function(event, callback, node) {
+query.watch = _.curry(function(eventNmae, callback, node) {
   node = query.node(node);
-  query.unwrap(node).addEventListener(event, callback);
+  callback = query.buildEventCallback(callback, node);
+  query.unwrap(node).addEventListener(eventName, callback);
+  return function() {
+    return query.unwrap(node).removeEventListener(eventName, callback);
+  };
+});
+
+query.trigger = _.curry(function(eventName, node) {
+  node = query.node(node);
+  var event = document.createEvent('HTMLEvents');
+  event.initEvent(eventName, true, false);
+  query.unwrap(node).dispatchEvent(event);
   return node;
 });
 
-query.unwatch = _.curry(function(event, callback, node) {
-  node = query.node(node);
-  query.unwrap(node).removeEventListener(event, callback);
-  return node;
-});
-
-query.ready = _.partial(document.addEventListener)('DOMContentLoaded');
+query.ready = _.curry(document.addEventListener)('DOMContentLoaded');
 
 (function(funcs) {
   _.forEach(funcs, function(func) {
@@ -87,38 +91,6 @@ query.list = function(selector) {
     _.isArray(selector) ? selector : _.toArray(document.querySelectorAll(selector))
   );
 };
-query.siblings = function(list) {
-};
-
-query.children = function(list) {
-  list = query.list(list);
-  return query.list(
-    _.reduce(query.array(query.unwrap(list)), function(children, element) {
-      return children.concat(_.toArray(element.children));
-    }, [])
-  );
-};
-
-query.parent = function(list) {
-  list = query.list(list);
-  return query.list(
-    _.map(query.array(query.unwrap(list)), function(element) {
-      return element.parentElement;
-    })
-  );
-};
-(function() {
-  function CustomEvent ( event, params ) {
-    params = params || { bubbles: false, cancelable: false, detail: undefined };
-    var evt = document.createEvent( 'CustomEvent' );
-    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
-    return evt;
-   }
-
-  CustomEvent.prototype = window.Event.prototype;
-
-  window.CustomEvent = CustomEvent;
-})();
 // Attributes
 query.getAttr = _.curry(function(attr, node) {
   return query.unwrap(query.node(node)).getAttribute(attr);
@@ -135,6 +107,7 @@ query.removeAttr = _.curry(function(attr, node) {
   query.unwrap(node).removeAttribute(attr);
   return node;
 });
+
 // Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   query[func + 'Class'] = _.curry(function(klasses, node) {
@@ -154,6 +127,7 @@ query.hasClass = _.curry(function(klasses, node) {
     return element.classList.contains(klass);
   });
 });
+
 query.getStyle = _.curry(function(property, node) {
   return getComputedStyle(query.unwrap(query.node(node)))[property];
 });
@@ -171,6 +145,7 @@ query.hide = function(node) {
 query.show = function(node) {
   return query.setStyle('display', '', query.node(node));
 };
+
 // Data
 query.getData = _.curry(function(attr, node) {
   return query.getAttr('data-' + attr, node);
@@ -183,6 +158,7 @@ query.setData = _.curry(function(attr, value, node) {
 query.removeData = _.curry(function(attr, node) {
   return query.removeAttr('data-' + attr, node);
 });
+
 // HTML
 query.getHTML = function(node) {
   return query.unwrap(query.node(node)).innerHTML;
@@ -203,19 +179,48 @@ query.setOuterHTML = _.curry(function(text, node) {
   query.unwrap(node).outerHTML = text;
   return node;
 });
+
+// Layout
+query.offset = function(node) {
+  node = query.node(node);
+  var rect = query.unwrap(node).getBoundingClientRect();
+
+  return {
+    top: rect.top + document.body.scrollTop,
+    left: rect.left + document.body.scrollLeft
+  };
+};
+
+query.position = function(node) {
+  node = query.node(node);
+  var element = query.unwrap(ndoe);
+  return {
+    top: element.offsetTop,
+    left: element.offsetLeft
+  };
+};
+
+query.outerHeight = function(node) {
+  return query.unwrap(query.node(node)).offsetHeight;
+};
+
+query.outerWidth = function(node) {
+  return query.unwrap(query.node(node)).offsetWidth;
+};
+
 query.remove = function(node) {
   node = query.node(node);
   query.unwrap(node).parentNode.removeChild(query.unwrap(node));
   return node;
 };
 
-query.after = _.curry(function(htmlString, node) {
+query.insertAfter = _.curry(function(htmlString, node) {
   node = query.node(node);
   query.unwrap(node).insertAdjacentHTML('afterend', htmlString);
   return node;
 });
 
-query.before = _.curry(function(htmlString, node) {
+query.insertBefore = _.curry(function(htmlString, node) {
   node = query.node(node);
   query.unwrap(node).insertAdjacentHTML('beforebegin', htmlString);
   return node;
@@ -232,6 +237,35 @@ query.prepend = _.curry(function(htmlString, node) {
   query.unwrap(node).insertAdjacentHTML('beforend', htmlString);
   return node;
 });
+
+query.equal = _.curry(function(node, test) {
+  return query.unwrap(query.node(node)) === query.unwrap(query.node(test));
+});
+
+query.attrEqual = _.curry(function(attr, value, node) {
+  return query.getAttr(attr, node) === value;
+});
+
+query.attrMatch = _.curry(function(attr, regex, node) {
+  return query.getAttr(attr, node).toString().match(regex);
+});
+
+query.dataEqual = _.curry(function(attr, value, node) {
+  return query.getData(attr, node) === value;
+});
+
+query.dataMatch = _.curry(function(attr, regex, node) {
+  return query.getData(attr, node).toString().match(regex);
+});
+
+query.textEqual = _.curry(function(value, node) {
+  return query.getText(node) === value;
+});
+
+query.textMatch = _.curry(function(regex, node) {
+  return query.getText(node).match(regex);
+});
+
 query.node = function(selector) {
   if (selector.wrapped) return selector;
 
@@ -240,14 +274,23 @@ query.node = function(selector) {
   );
 };
 
-// State
-query.isEmpty = function(node) {
-  return !!query.getText(node);
-};
-
-query.isMatch = _.curry(function(node1, node2) {
-  return node1 === node2;
+// Properties
+query.getProp = _.curry(function(prop, node) {
+  return query.unwrap(query.node(node))[prop];
 });
+
+query.setProp = _.curry(function(prop, value, node) {
+  node = query.node(node);
+  query.unwrap(node)[prop] = value;
+  return node;
+});
+
+query.removeProp = _.curry(function(prop, node) {
+  node = query.node(node);
+  delete query.unwrap(node)[prop];
+  return node;
+});
+
 // Text
 query.getText = function(node) {
   return query.unwrap(query.node(node)).textContent;
@@ -258,6 +301,21 @@ query.setText = _.curry(function(text, node) {
   query.unwrap(node).textContent = text;
   return node;
 });
+
+query.siblings = function(node) {
+  node = query.node(node);
+  return d.reject(d.equal(node), query.unwrap(node).parentNode.children);
+};
+
+query.children = function(node) {
+  node = query.node(node);
+  return d.map(d.getProp('children'), query.unwrap(node).children);
+};
+
+query.parent = function(node) {
+  return query.list(query.unwrap(query.node(node)).children);
+};
+
 
     return query;
   }
