@@ -1,5 +1,4 @@
 var gulp = require('gulp');
-var changed = require('gulp-changed');
 var concat = require('gulp-concat');
 var plumber = require('gulp-plumber');
 var validate = require('gulp-jsvalidate');
@@ -30,7 +29,6 @@ gulp.task('validate', function() {
 gulp.task('build', function() {
   gulp.src(config.src).
     pipe(plumber()).
-    pipe(changed(config.dist)).
     pipe(concat(config.outdev)).
     pipe(wrap({ src: config.template })).
     pipe(gulp.dest(config.dist));

@@ -1,6 +1,6 @@
 // HTML
 f.getHTML = adapt(function(node) {
-  return f.node(node).innerHTML;
+  return f.node(node).innerHTML.trim();
 });
 
 f.setHTML = adapt(function(value, node) {

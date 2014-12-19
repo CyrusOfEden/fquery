@@ -1,6 +1,6 @@
 // Properties
 f.getProp = adapt(function(prop, node) {
-  return f.node(node)[prop];
+  return (f.node(node)[prop] || '').trim();
 });
 
 f.setProp = adapt(function(prop, value, node) {

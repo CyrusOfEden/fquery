@@ -1,6 +1,6 @@
 // Attributes
 f.getAttr = adapt(function(attr, node) {
-  return f.node(node).getAttribute(attr);
+  return (f.node(node).getAttribute(attr) || '').trim();
 });
 
 f.setAttr = adapt(function(attr, value, node) {

@@ -15,3 +15,7 @@ f.hasClass = adapt(function(klasses, node) {
     return node.classList.contains(klass);
   });
 });
+
+f.getClass = adapt(function(klasses, node) {
+  return _.toArray(f.node(node).classList);
+});

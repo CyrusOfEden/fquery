@@ -33,9 +33,71 @@ function adapt(func, arity) {
   return curry(reduce, arity || func.length);
 }
 
+(function(funcs) {
+  _.forEach(funcs, function(func) {
+    f[func] = curry(function(callback, list) {
+      return _[func](f.list(list), callback);
+    });
+  });
+})([
+  'each', 'forEach', 'forEachRight',
+  'all', 'every',
+  'any', 'some',
+  'collect', 'map',
+  'reduce', 'foldl', 'inject',
+  'reduceRight', 'foldr',
+  'select', 'filter',
+  'reject',
+  'find', 'detect', 'findWhere', 'findLast',
+  'countBy', 'groupBy', 'indexBy', 'sortBy',
+  'invoke'
+]);
+
+// ToDo
+// 'head', 'initial', 'tail',
+// 'size'
+// 'first', 'last'
+
+f.list = f.l = function(s) {
+  if (_.isArray(s)) {
+    return s;
+  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
+    return _.toArray(s);
+  } else {
+    return _.toArray(document.querySelectorAll(s));
+  }
+};
+
+function eventWatcher(func, node, event) {
+  return function(event) {
+    return func(event, node);
+  }
+}
+
+f.watch = adapt(function(eventName, func, node) {
+  node = f.node(node);
+  func = eventWatcher(func, node);
+  node.addEventListener(eventName, func);
+  return function() {
+    return node.removeEventListener(eventName, func);
+  }
+});
+
+f.trigger = adapt(function(eventName, node) {
+  node = f.node(node);
+  var event = document.createEvent('HTMLEvents');
+  event.initEvent(eventName, true, false);
+  node.dispatchEvent(event);
+  return node;
+});
+
+f.ready = function(func) {
+  document.addEventListener('DOMContentLoaded', func);
+};
+
 // Attributes
 f.getAttr = adapt(function(attr, node) {
-  return f.node(node).getAttribute(attr);
+  return (f.node(node).getAttribute(attr) || '').trim();
 });
 
 f.setAttr = adapt(function(attr, value, node) {
@@ -68,6 +130,10 @@ f.hasClass = adapt(function(klasses, node) {
   });
 });
 
+f.getClass = adapt(function(klasses, node) {
+  return _.toArray(f.node(node).classList);
+});
+
 f.getStyle = adapt(function(property, node) {
   return getComputedStyle(f.node(node))[property];
 });
@@ -83,7 +149,7 @@ f.show = f.setStyle('display', '');
 
 // Data
 f.getData = adapt(function(attr, node) {
-  return f.getAttr('data-' + attr, node);
+  return f.getAttr('data-' + attr, node).trim();
 });
 
 f.setData = adapt(function(attr, value, node) {
@@ -96,7 +162,7 @@ f.removeData = adapt(function(attr, node) {
 
 // HTML
 f.getHTML = adapt(function(node) {
-  return f.node(node).innerHTML;
+  return f.node(node).innerHTML.trim();
 });
 
 f.setHTML = adapt(function(value, node) {
@@ -172,7 +238,7 @@ f.prepend = adapt(function(value, node) {
 
 // Properties
 f.getProp = adapt(function(prop, node) {
-  return f.node(node)[prop];
+  return (f.node(node)[prop] || '').trim();
 });
 
 f.setProp = adapt(function(prop, value, node) {
@@ -189,7 +255,7 @@ f.removeProp = adapt(function(prop, node) {
 
 // Text
 f.getText = adapt(function(node) {
-  return f.node(node).textContent;
+  return (f.node(node).textContent || '').trim();
 });
 
 f.setText = adapt(function(value, node) {
@@ -213,68 +279,6 @@ f.children = adapt(function(node) {
 f.parent = adapt(function(node) {
   return f.node(f.node(node).parentNode);
 });
-
-(function(funcs) {
-  _.forEach(funcs, function(func) {
-    f[func] = curry(function(callback, list) {
-      return _[func](f.list(list), callback);
-    });
-  });
-})([
-  'each', 'forEach', 'forEachRight',
-  'all', 'every',
-  'any', 'some',
-  'collect', 'map',
-  'reduce', 'foldl', 'inject',
-  'reduceRight', 'foldr',
-  'select', 'filter',
-  'reject',
-  'find', 'detect', 'findWhere', 'findLast',
-  'countBy', 'groupBy', 'indexBy', 'sortBy',
-  'invoke'
-]);
-
-// ToDo
-// 'head', 'initial', 'tail',
-// 'size'
-// 'first', 'last'
-
-f.list = f.l = function(s) {
-  if (_.isArray(s)) {
-    return s;
-  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
-    return _.toArray(s);
-  } else {
-    return _.toArray(document.querySelectorAll(s));
-  }
-};
-
-function eventWatcher(func, node, event) {
-  return function(event) {
-    return func(event, node);
-  }
-}
-
-f.watch = adapt(function(eventName, func, node) {
-  node = f.node(node);
-  func = eventWatcher(func, node);
-  node.addEventListener(eventName, func);
-  return function() {
-    return node.removeEventListener(eventName, func);
-  }
-});
-
-f.trigger = adapt(function(eventName, node) {
-  node = f.node(node);
-  var event = document.createEvent('HTMLEvents');
-  event.initEvent(eventName, true, false);
-  node.dispatchEvent(event);
-  return node;
-});
-
-f.ready = function(func) {
-  document.addEventListener('DOMContentLoaded', func);
-};
 
 f.equal = curry(function(node, test) {
   return f.node(node) === f.node(test);
