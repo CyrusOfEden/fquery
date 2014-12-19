@@ -1,13 +1,15 @@
-query.siblings = function(node) {
-  node = query.node(node);
-  return d.reject(d.equal(node), query.unwrap(node).parentNode.children);
+f.siblings = function(node) {
+  node = f.node(node);
+  return f.reject(
+    f.equal(node),
+    f.list(node.parentNode.children)
+  );
 };
 
-query.children = function(node) {
-  node = query.node(node);
-  return d.map(d.getProp('children'), query.unwrap(node).children);
+f.children = function(node) {
+  return f.list(f.node(node).children);
 };
 
-query.parent = function(node) {
-  return query.list(query.unwrap(query.node(node)).children);
+f.parent = function(node) {
+  return f.node(f.node(node).parentNode);
 };

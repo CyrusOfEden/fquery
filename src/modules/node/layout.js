@@ -1,27 +1,24 @@
 // Layout
-query.offset = function(node) {
-  node = query.node(node);
-  var rect = query.unwrap(node).getBoundingClientRect();
-
+f.offset = function(node) {
+  var rect = f.node(node).getBoundingClientRect();
   return {
     top: rect.top + document.body.scrollTop,
     left: rect.left + document.body.scrollLeft
   };
 };
 
-query.position = function(node) {
-  node = query.node(node);
-  var element = query.unwrap(ndoe);
+f.position = function(node) {
+  node = f.node(node);
   return {
-    top: element.offsetTop,
-    left: element.offsetLeft
+    top: node.offsetTop,
+    left: node.offsetLeft
   };
 };
 
-query.outerHeight = function(node) {
-  return query.unwrap(query.node(node)).offsetHeight;
+f.outerHeight = function(node) {
+  return f.node(node).offsetHeight;
 };
 
-query.outerWidth = function(node) {
-  return query.unwrap(query.node(node)).offsetWidth;
+f.outerWidth = function(node) {
+  return f.node(node).offsetWidth;
 };

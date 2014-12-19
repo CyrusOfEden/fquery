@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var changed = require('gulp-changed');
 var concat = require('gulp-concat');
+var plumber = require('gulp-plumber');
 var validate = require('gulp-jsvalidate');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
@@ -22,11 +23,13 @@ gulp.task('clean', function() {
 
 gulp.task('validate', function() {
   gulp.src(config.src).
+    pipe(plumber()).
     pipe(validate());
 });
 
 gulp.task('build', function() {
   gulp.src(config.src).
+    pipe(plumber()).
     pipe(changed(config.dist)).
     pipe(concat(config.outdev)).
     pipe(wrap({ src: config.template })).
@@ -35,6 +38,7 @@ gulp.task('build', function() {
 
 gulp.task('minify', function() {
   gulp.src(config.dist + config.outdev).
+    pipe(plumber()).
     pipe(rename(config.outmin)).
     pipe(uglify()).
     pipe(gulp.dest(config.dist));

@@ -1,16 +1,16 @@
 // Attributes
-query.getAttr = _.curry(function(attr, node) {
-  return query.unwrap(query.node(node)).getAttribute(attr);
+f.getAttr = f.curry(function(attr, node) {
+  return f.node(node).getAttribute(attr);
 });
 
-query.setAttr = _.curry(function(attr, value, node) {
-  node = query.node(node);
-  query.unwrap(node).setAttribute(attr, value);
+f.setAttr = f.curry(function(attr, value, node) {
+  node = f.node(node);
+  node.setAttribute(attr, get(value, node));
   return node;
 });
 
-query.removeAttr = _.curry(function(attr, node) {
-  node = query.node(node);
-  query.unwrap(node).removeAttribute(attr);
+f.removeAttr = f.curry(function(attr, node) {
+  node = f.node(node);
+  node.removeAttribute(attr);
   return node;
 });

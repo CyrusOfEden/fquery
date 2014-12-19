@@ -1,7 +1,9 @@
-query.list = function(selector) {
-  if (selector.wrapped) return selector;
-
-  return query.wrap(
-    _.isArray(selector) ? selector : _.toArray(document.querySelectorAll(selector))
-  );
+f.list = function(s) {
+  if (_.isArray(s)) {
+    return s;
+  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
+    return _.toArray(s);
+  } else {
+    return _.toArray(document.querySelectorAll(s));
+  }
 };

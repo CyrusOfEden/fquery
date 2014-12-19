@@ -1,16 +1,16 @@
 // Properties
-query.getProp = _.curry(function(prop, node) {
-  return query.unwrap(query.node(node))[prop];
+f.getProp = f.curry(function(prop, node) {
+  return f.node(node)[prop];
 });
 
-query.setProp = _.curry(function(prop, value, node) {
-  node = query.node(node);
-  query.unwrap(node)[prop] = value;
+f.setProp = f.curry(function(prop, value, node) {
+  node = f.node(node);
+  node[prop] = get(value, node);
   return node;
 });
 
-query.removeProp = _.curry(function(prop, node) {
-  node = query.node(node);
-  delete query.unwrap(node)[prop];
+f.removeProp = f.curry(function(prop, node) {
+  node = f.node(node);
+  delete node[prop];
   return node;
 });

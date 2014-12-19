@@ -1,7 +1,7 @@
 (function(funcs) {
   _.forEach(funcs, function(func) {
-    query[func] = _.curry(function(callback, list) {
-      return query.wrap(_[func](query.unwrap(query.list(list)), callback));
+    f[func] = f.curry(function(callback, list) {
+      return _[func](f.list(list), callback);
     });
   });
 })([
@@ -15,6 +15,10 @@
   'reject',
   'find', 'detect', 'findWhere', 'findLast',
   'countBy', 'groupBy', 'indexBy', 'sortBy',
-  'invoke',
-  'size'
+  'invoke'
 ]);
+
+// ToDo
+// 'head', 'initial', 'tail',
+// 'size'
+// 'first', 'last'

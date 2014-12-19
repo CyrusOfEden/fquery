@@ -15,59 +15,56 @@
   var root = window || this;
 
   function runInContext() {
-    var query = {};
+    var f = {};
 
-var f = (function() {
-  function f(object) {
-    this.wrapped = true;
-    this.value = object;
+function get(f, x) {
+  return _.isFunction(f) ? f(x) : f;
+}
+
+function array(f) {
+  return _.isArray(f) ? f : [f];
+}
+
+f.curry = _.curry;
+
+f.func = function(func) {
+  func = f.curry(func);
+  return function(data) {
+    return _.isArray(data) ? f.map(func, data) : func(data);
   }
+}
 
-  f.prototype.valueOf = f.prototype.toString = function() {
-    return this.value;
-  };
+function eventWatcher(func, node, event) {
+  return function(event) {
+    return func(event, node);
+  }
+}
 
-  return f;
-})();
-
-query.wrap = function(object) {
-  return new f(object);
-};
-
-query.unwrap = function(f) {
-  return f.value;
-};
-query.array = function(array) {
-  return _.isArray(array) ? array : [array];
-};
-
-query.buildEventCallback = _.curry(function(callback, node, event) {
-  return callback(node, event);
-});
-
-query.watch = _.curry(function(eventNmae, callback, node) {
-  node = query.node(node);
-  callback = query.buildEventCallback(callback, node);
-  query.unwrap(node).addEventListener(eventName, callback);
+f.watch = f.curry(function(eventName, func, node) {
+  node = f.node(node);
+  func = eventWatcher(func, node);
+  node.addEventListener(eventName, func);
   return function() {
-    return query.unwrap(node).removeEventListener(eventName, callback);
-  };
+    return node.removeEventListener(eventName, func);
+  }
 });
 
-query.trigger = _.curry(function(eventName, node) {
-  node = query.node(node);
+f.trigger = f.curry(function(eventName, node) {
+  node = f.node(node);
   var event = document.createEvent('HTMLEvents');
   event.initEvent(eventName, true, false);
-  query.unwrap(node).dispatchEvent(event);
+  node.dispatchEvent(event);
   return node;
 });
 
-query.ready = _.curry(document.addEventListener)('DOMContentLoaded');
+f.ready = function(func) {
+  document.addEventListener('DOMContentLoaded', func);
+};
 
 (function(funcs) {
   _.forEach(funcs, function(func) {
-    query[func] = _.curry(function(callback, list) {
-      return query.wrap(_[func](query.unwrap(query.list(list)), callback));
+    f[func] = f.curry(function(callback, list) {
+      return _[func](f.list(list), callback);
     });
   });
 })([
@@ -81,262 +78,258 @@ query.ready = _.curry(document.addEventListener)('DOMContentLoaded');
   'reject',
   'find', 'detect', 'findWhere', 'findLast',
   'countBy', 'groupBy', 'indexBy', 'sortBy',
-  'invoke',
-  'size'
+  'invoke'
 ]);
-query.list = function(selector) {
-  if (selector.wrapped) return selector;
 
-  return query.wrap(
-    _.isArray(selector) ? selector : _.toArray(document.querySelectorAll(selector))
-  );
+// ToDo
+// 'head', 'initial', 'tail',
+// 'size'
+// 'first', 'last'
+
+f.list = function(s) {
+  if (_.isArray(s)) {
+    return s;
+  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
+    return _.toArray(s);
+  } else {
+    return _.toArray(document.querySelectorAll(s));
+  }
 };
+
 // Attributes
-query.getAttr = _.curry(function(attr, node) {
-  return query.unwrap(query.node(node)).getAttribute(attr);
+f.getAttr = f.curry(function(attr, node) {
+  return f.node(node).getAttribute(attr);
 });
 
-query.setAttr = _.curry(function(attr, value, node) {
-  node = query.node(node);
-  query.unwrap(node).setAttribute(attr, value);
+f.setAttr = f.curry(function(attr, value, node) {
+  node = f.node(node);
+  node.setAttribute(attr, get(value, node));
   return node;
 });
 
-query.removeAttr = _.curry(function(attr, node) {
-  node = query.node(node);
-  query.unwrap(node).removeAttribute(attr);
+f.removeAttr = f.curry(function(attr, node) {
+  node = f.node(node);
+  node.removeAttribute(attr);
   return node;
 });
 
 // Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
-  query[func + 'Class'] = _.curry(function(klasses, node) {
-    node = query.node(node);
-    var element = query.unwrap(node);
-    _.forEach(query.array(klasses), function(klass) {
-      element.classList[func](klass);
+  f[func + 'Class'] = f.curry(function(klasses, node) {
+    node = f.node(node);
+    _.forEach(array(classes), function(klass) {
+      node.classList[func](klass);
     });
     return node;
   });
 });
 
-query.hasClass = _.curry(function(klasses, node) {
-  node = query.node(node);
-  var element = query.unwrap(node);
-  return _.all(query.array(klasses), function(klass) {
-    return element.classList.contains(klass);
+f.hasClass = f.curry(function(klasses, node) {
+  node = f.node(node);
+  return _.all(f.array(klasses), function(klass) {
+    return node.classList.contains(klass);
   });
 });
 
-query.getStyle = _.curry(function(property, node) {
-  return getComputedStyle(query.unwrap(query.node(node)))[property];
+f.getStyle = f.curry(function(property, node) {
+  return getComputedStyle(f.node(node))[property];
 });
 
-query.setStyle = _.curry(function(property, value, node) {
-  node = query.node(node);
-  query.unwrap(node).style[property] = value;
+f.setStyle = f.curry(function(property, value, node) {
+  node = f.node(node);
+  node.style[property] = get(value, node);
   return node;
 });
 
-query.hide = function(node) {
-  return query.setStyle('display', 'none', query.node(node));
-};
-
-query.show = function(node) {
-  return query.setStyle('display', '', query.node(node));
-};
+f.hide = _f.setStyle('display', 'none');
+f.show = f.setStyle('display', '');
 
 // Data
-query.getData = _.curry(function(attr, node) {
-  return query.getAttr('data-' + attr, node);
+f.getData = f.curry(function(attr, node) {
+  return f.getAttr('data-' + attr, node);
 });
 
-query.setData = _.curry(function(attr, value, node) {
-  return query.setAttr('data-' + attr, value, node);
+f.setData = f.curry(function(attr, value, node) {
+  return f.setAttr('data-' + attr, get(value, node), node);
 });
 
-query.removeData = _.curry(function(attr, node) {
-  return query.removeAttr('data-' + attr, node);
+f.removeData = f.curry(function(attr, node) {
+  return f.removeAttr('data-' + attr, node);
 });
 
 // HTML
-query.getHTML = function(node) {
-  return query.unwrap(query.node(node)).innerHTML;
+f.getHTML = function(node) {
+  return f.node(node).innerHTML;
 };
 
-query.setHTML = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).innerHTML = text;
+f.setHTML = f.curry(function(value, node) {
+  node = f.node(node);
+  node.innerHTML = get(value, node);
   return node;
 });
 
-query.getOuterHTML = function(node) {
-  return query.unwrap(query.node(node)).outerHTML;
+f.getOuterHTML = function(node) {
+  return f.node(node).outerHTML;
 };
 
-query.setOuterHTML = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).outerHTML = text;
+f.setOuterHTML = f.curry(function(value, node) {
+  node = f.node(node);
+  node.outerHTML = get(value, node);
   return node;
 });
 
 // Layout
-query.offset = function(node) {
-  node = query.node(node);
-  var rect = query.unwrap(node).getBoundingClientRect();
-
+f.offset = function(node) {
+  var rect = f.node(node).getBoundingClientRect();
   return {
     top: rect.top + document.body.scrollTop,
     left: rect.left + document.body.scrollLeft
   };
 };
 
-query.position = function(node) {
-  node = query.node(node);
-  var element = query.unwrap(ndoe);
+f.position = function(node) {
+  node = f.node(node);
   return {
-    top: element.offsetTop,
-    left: element.offsetLeft
+    top: node.offsetTop,
+    left: node.offsetLeft
   };
 };
 
-query.outerHeight = function(node) {
-  return query.unwrap(query.node(node)).offsetHeight;
+f.outerHeight = function(node) {
+  return f.node(node).offsetHeight;
 };
 
-query.outerWidth = function(node) {
-  return query.unwrap(query.node(node)).offsetWidth;
+f.outerWidth = function(node) {
+  return f.node(node).offsetWidth;
 };
 
-query.remove = function(node) {
-  node = query.node(node);
-  query.unwrap(node).parentNode.removeChild(query.unwrap(node));
+f.remove = function(node) {
+  node = f.node(node);
+  node.parentNode.removeChild(node);
   return node;
 };
 
-query.insertAfter = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('afterend', htmlString);
+f.insertAfter = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('afterend', get(value, node));
   return node;
 });
 
-query.insertBefore = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('beforebegin', htmlString);
+f.insertBefore = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('beforebegin', get(value, node));
   return node;
 });
 
-query.append = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('afterbegin', htmlString);
+f.append = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('afterbegin', get(value, node));
   return node;
 });
 
-query.prepend = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('beforend', htmlString);
+f.prepend = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('beforend', get(value, node));
   return node;
 });
 
-query.equal = _.curry(function(node, test) {
-  return query.unwrap(query.node(node)) === query.unwrap(query.node(test));
+f.equal = f.curry(function(node, test) {
+  return f.node(node) === f.node(test);
 });
 
-query.attrEqual = _.curry(function(attr, value, node) {
-  return query.getAttr(attr, node) === value;
+f.attrEqual = f.curry(function(attr, value, node) {
+  return f.getAttr(attr, node) === value;
 });
 
-query.attrMatch = _.curry(function(attr, regex, node) {
-  return query.getAttr(attr, node).toString().match(regex);
+f.attrMatch = f.curry(function(attr, regex, node) {
+  return f.getAttr(attr, node).toString().match(regex);
 });
 
-query.dataEqual = _.curry(function(attr, value, node) {
-  return query.getData(attr, node) === value;
+f.dataEqual = f.curry(function(attr, value, node) {
+  return f.getData(attr, node) === value;
 });
 
-query.dataMatch = _.curry(function(attr, regex, node) {
-  return query.getData(attr, node).toString().match(regex);
+f.dataMatch = f.curry(function(attr, regex, node) {
+  return f.getData(attr, node).toString().match(regex);
 });
 
-query.textEqual = _.curry(function(value, node) {
-  return query.getText(node) === value;
+f.textEqual = f.curry(function(value, node) {
+  return f.getText(node) === value;
 });
 
-query.textMatch = _.curry(function(regex, node) {
-  return query.getText(node).match(regex);
+f.textMatch = f.curry(function(regex, node) {
+  return f.getText(node).match(regex);
 });
 
-query.node = function(selector) {
-  if (selector.wrapped) return selector;
-
-  return query.wrap(
-    selector instanceof Element ? selector : document.querySelector(selector)
-  );
+f.node = function(s) {
+  return s instanceof Element ? s : document.querySelector(s)
 };
 
 // Properties
-query.getProp = _.curry(function(prop, node) {
-  return query.unwrap(query.node(node))[prop];
+f.getProp = f.curry(function(prop, node) {
+  return f.node(node)[prop];
 });
 
-query.setProp = _.curry(function(prop, value, node) {
-  node = query.node(node);
-  query.unwrap(node)[prop] = value;
+f.setProp = f.curry(function(prop, value, node) {
+  node = f.node(node);
+  node[prop] = get(value, node);
   return node;
 });
 
-query.removeProp = _.curry(function(prop, node) {
-  node = query.node(node);
-  delete query.unwrap(node)[prop];
+f.removeProp = f.curry(function(prop, node) {
+  node = f.node(node);
+  delete node[prop];
   return node;
 });
 
 // Text
-query.getText = function(node) {
-  return query.unwrap(query.node(node)).textContent;
+f.getText = function(node) {
+  return f.node(node).textContent;
 };
 
-query.setText = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).textContent = text;
+f.setText = f.curry(function(value, node) {
+  node = f.node(node);
+  node.textContent = get(value, node);
   return node;
 });
 
-query.siblings = function(node) {
-  node = query.node(node);
-  return d.reject(d.equal(node), query.unwrap(node).parentNode.children);
+f.siblings = function(node) {
+  node = f.node(node);
+  return f.reject(
+    f.equal(node),
+    f.list(node.parentNode.children)
+  );
 };
 
-query.children = function(node) {
-  node = query.node(node);
-  return d.map(d.getProp('children'), query.unwrap(node).children);
+f.children = function(node) {
+  return f.list(f.node(node).children);
 };
 
-query.parent = function(node) {
-  return query.list(query.unwrap(query.node(node)).children);
+f.parent = function(node) {
+  return f.node(f.node(node).parentNode);
 };
 
 
-    return query;
+    return f;
   }
 
-  var d = runInContext();
+  var f = runInContext();
 
   // some AMD build optimizers like r.js check for condition patterns like the following:
   if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
     // Expose Lo-Dash to the global object even when an AMD loader is present in
     // case Lo-Dash is loaded with a RequireJS shim config.
     // See http://requirejs.org/docs/api.html#config-shim
-    root.d = d;
+    root.f = f;
 
     // define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module
     define(function() {
-      return d;
+      return f;
     });
   } else {
     // in a browser or Rhino
-    root.d = d;
+    root.f = f;
   }
 
 }).call(this);

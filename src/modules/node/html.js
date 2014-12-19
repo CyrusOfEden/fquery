@@ -1,20 +1,20 @@
 // HTML
-query.getHTML = function(node) {
-  return query.unwrap(query.node(node)).innerHTML;
+f.getHTML = function(node) {
+  return f.node(node).innerHTML;
 };
 
-query.setHTML = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).innerHTML = text;
+f.setHTML = f.curry(function(value, node) {
+  node = f.node(node);
+  node.innerHTML = get(value, node);
   return node;
 });
 
-query.getOuterHTML = function(node) {
-  return query.unwrap(query.node(node)).outerHTML;
+f.getOuterHTML = function(node) {
+  return f.node(node).outerHTML;
 };
 
-query.setOuterHTML = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).outerHTML = text;
+f.setOuterHTML = f.curry(function(value, node) {
+  node = f.node(node);
+  node.outerHTML = get(value, node);
   return node;
 });

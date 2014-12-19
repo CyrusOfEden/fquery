@@ -1,10 +1,10 @@
 // Text
-query.getText = function(node) {
-  return query.unwrap(query.node(node)).textContent;
+f.getText = function(node) {
+  return f.node(node).textContent;
 };
 
-query.setText = _.curry(function(text, node) {
-  node = query.node(node);
-  query.unwrap(node).textContent = text;
+f.setText = f.curry(function(value, node) {
+  node = f.node(node);
+  node.textContent = get(value, node);
   return node;
 });

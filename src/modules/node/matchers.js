@@ -1,27 +1,27 @@
-query.equal = _.curry(function(node, test) {
-  return query.unwrap(query.node(node)) === query.unwrap(query.node(test));
+f.equal = f.curry(function(node, test) {
+  return f.node(node) === f.node(test);
 });
 
-query.attrEqual = _.curry(function(attr, value, node) {
-  return query.getAttr(attr, node) === value;
+f.attrEqual = f.curry(function(attr, value, node) {
+  return f.getAttr(attr, node) === value;
 });
 
-query.attrMatch = _.curry(function(attr, regex, node) {
-  return query.getAttr(attr, node).toString().match(regex);
+f.attrMatch = f.curry(function(attr, regex, node) {
+  return f.getAttr(attr, node).toString().match(regex);
 });
 
-query.dataEqual = _.curry(function(attr, value, node) {
-  return query.getData(attr, node) === value;
+f.dataEqual = f.curry(function(attr, value, node) {
+  return f.getData(attr, node) === value;
 });
 
-query.dataMatch = _.curry(function(attr, regex, node) {
-  return query.getData(attr, node).toString().match(regex);
+f.dataMatch = f.curry(function(attr, regex, node) {
+  return f.getData(attr, node).toString().match(regex);
 });
 
-query.textEqual = _.curry(function(value, node) {
-  return query.getText(node) === value;
+f.textEqual = f.curry(function(value, node) {
+  return f.getText(node) === value;
 });
 
-query.textMatch = _.curry(function(regex, node) {
-  return query.getText(node).match(regex);
+f.textMatch = f.curry(function(regex, node) {
+  return f.getText(node).match(regex);
 });

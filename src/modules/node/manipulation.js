@@ -1,29 +1,29 @@
-query.remove = function(node) {
-  node = query.node(node);
-  query.unwrap(node).parentNode.removeChild(query.unwrap(node));
+f.remove = function(node) {
+  node = f.node(node);
+  node.parentNode.removeChild(node);
   return node;
 };
 
-query.insertAfter = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('afterend', htmlString);
+f.insertAfter = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('afterend', get(value, node));
   return node;
 });
 
-query.insertBefore = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('beforebegin', htmlString);
+f.insertBefore = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('beforebegin', get(value, node));
   return node;
 });
 
-query.append = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('afterbegin', htmlString);
+f.append = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('afterbegin', get(value, node));
   return node;
 });
 
-query.prepend = _.curry(function(htmlString, node) {
-  node = query.node(node);
-  query.unwrap(node).insertAdjacentHTML('beforend', htmlString);
+f.prepend = f.curry(function(value, node) {
+  node = f.node(node);
+  node.insertAdjacentHTML('beforend', get(value, node));
   return node;
 });
