@@ -15,9 +15,7 @@ function array(f) {
   return _.isArray(f) ? f : [f];
 }
 
-var curry = _.curry;
-
-if (!curry) {
+var curry = _.curry || (function() {
   function enforcesUnary (fn) {
     return function mustBeUnary() {
       if (arguments.length === 1) {
@@ -27,30 +25,27 @@ if (!curry) {
       }
     };
   }
-
-  curry = (function() {
-    function collectArgs(func, that, argCount, args, newArg, reverse) {
-      if (reverse === true) {
-        args.unshift(newArg);
-      } else {
-        args.push(newArg);
-      }
-      if (args.length == argCount) {
-        return func.apply(that, args);
-      } else {
-        return enforcesUnary(function () {
-          return collectArgs(func, that, argCount, args.slice(0), arguments[0], reverse);
-        });
-      }
+  function collectArgs(func, that, argCount, args, newArg, reverse) {
+    if (reverse === true) {
+      args.unshift(newArg);
+    } else {
+      args.push(newArg);
     }
-    return function curry(func, reverse) {
-      var that = this;
-      return enforcesUnary(function() {
-        return collectArgs(func, that, func.length, [], arguments[0], reverse);
+    if (args.length == argCount) {
+      return func.apply(that, args);
+    } else {
+      return enforcesUnary(function () {
+        return collectArgs(func, that, argCount, args.slice(0), arguments[0], reverse);
       });
-    };
-  })();
-}
+    }
+  }
+  return function curry(func, reverse) {
+    var that = this;
+    return enforcesUnary(function() {
+      return collectArgs(func, that, func.length, [], arguments[0], reverse);
+    });
+  };
+})();
 
 function adapt(func, arity) {
   function reduce() {
@@ -93,41 +88,6 @@ f.trigger = adapt(function(eventName, node) {
 
 f.ready = function(func) {
   document.addEventListener('DOMContentLoaded', func);
-};
-
-(function(funcs) {
-  _.forEach(funcs, function(func) {
-    f[func] = curry(function(callback, list) {
-      return _[func](f.list(list), callback);
-    });
-  });
-})([
-  'each', 'forEach', 'forEachRight',
-  'all', 'every',
-  'any', 'some',
-  'collect', 'map',
-  'reduce', 'foldl', 'inject',
-  'reduceRight', 'foldr',
-  'select', 'filter',
-  'reject',
-  'find', 'detect', 'findWhere', 'findLast',
-  'countBy', 'groupBy', 'indexBy', 'sortBy',
-  'invoke'
-]);
-
-// ToDo
-// 'head', 'initial', 'tail',
-// 'size'
-// 'first', 'last'
-
-f.list = f.l = function(s) {
-  if (_.isArray(s)) {
-    return s;
-  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
-    return _.toArray(s);
-  } else {
-    return _.toArray(document.querySelectorAll(s));
-  }
 };
 
 // Attributes
@@ -314,6 +274,41 @@ f.children = adapt(function(node) {
 f.parent = adapt(function(node) {
   return f.node(f.node(node).parentNode);
 });
+
+(function(funcs) {
+  _.forEach(funcs, function(func) {
+    f[func] = curry(function(callback, list) {
+      return _[func](f.list(list), callback);
+    });
+  });
+})([
+  'each', 'forEach', 'forEachRight',
+  'all', 'every',
+  'any', 'some',
+  'collect', 'map',
+  'reduce', 'foldl', 'inject',
+  'reduceRight', 'foldr',
+  'select', 'filter',
+  'reject',
+  'find', 'detect', 'findWhere', 'findLast',
+  'countBy', 'groupBy', 'indexBy', 'sortBy',
+  'invoke'
+]);
+
+// ToDo
+// 'head', 'initial', 'tail',
+// 'size'
+// 'first', 'last'
+
+f.list = f.l = function(s) {
+  if (_.isArray(s)) {
+    return s;
+  } else if (s instanceof HTMLCollection || s instanceof NodeList) {
+    return _.toArray(s);
+  } else {
+    return _.toArray(document.querySelectorAll(s));
+  }
+};
 
 f.equal = curry(function(node, test) {
   return f.node(node) === f.node(test);
