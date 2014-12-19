@@ -1,8 +1,8 @@
-f.getStyle = f.curry(function(property, node) {
+f.getStyle = _.curry(function(property, node) {
   return getComputedStyle(f.node(node))[property];
 });
 
-f.setStyle = f.curry(function(property, value, node) {
+f.setStyle = _.curry(function(property, value, node) {
   node = f.node(node);
   node.style[property] = get(value, node);
   return node;

@@ -5,12 +5,3 @@ function get(f, x) {
 function array(f) {
   return _.isArray(f) ? f : [f];
 }
-
-f.curry = _.curry;
-
-f.func = function(func) {
-  func = f.curry(func);
-  return function(data) {
-    return _.isArray(data) ? f.map(func, data) : func(data);
-  }
-}

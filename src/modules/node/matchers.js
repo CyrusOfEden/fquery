@@ -1,27 +1,27 @@
-f.equal = f.curry(function(node, test) {
+f.equal = _.curry(function(node, test) {
   return f.node(node) === f.node(test);
 });
 
-f.attrEqual = f.curry(function(attr, value, node) {
+f.attrEqual = _.curry(function(attr, value, node) {
   return f.getAttr(attr, node) === value;
 });
 
-f.attrMatch = f.curry(function(attr, regex, node) {
+f.attrMatch = _.curry(function(attr, regex, node) {
   return f.getAttr(attr, node).toString().match(regex);
 });
 
-f.dataEqual = f.curry(function(attr, value, node) {
+f.dataEqual = _.curry(function(attr, value, node) {
   return f.getData(attr, node) === value;
 });
 
-f.dataMatch = f.curry(function(attr, regex, node) {
+f.dataMatch = _.curry(function(attr, regex, node) {
   return f.getData(attr, node).toString().match(regex);
 });
 
-f.textEqual = f.curry(function(value, node) {
+f.textEqual = _.curry(function(value, node) {
   return f.getText(node) === value;
 });
 
-f.textMatch = f.curry(function(regex, node) {
+f.textMatch = _.curry(function(regex, node) {
   return f.getText(node).match(regex);
 });
