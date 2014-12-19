@@ -17,6 +17,41 @@ function array(f) {
 
 var curry = _.curry;
 
+if (!curry) {
+  function enforcesUnary (fn) {
+    return function mustBeUnary() {
+      if (arguments.length === 1) {
+        return fn.apply(this, arguments);
+      } else {
+        throw new RangeError('Only a single argument may be accepted.');
+      }
+    };
+  }
+
+  curry = (function() {
+    function collectArgs(func, that, argCount, args, newArg, reverse) {
+      if (reverse === true) {
+        args.unshift(newArg);
+      } else {
+        args.push(newArg);
+      }
+      if (args.length == argCount) {
+        return func.apply(that, args);
+      } else {
+        return enforcesUnary(function () {
+          return collectArgs(func, that, argCount, args.slice(0), arguments[0], reverse);
+        });
+      }
+    }
+    return function curry(func, reverse) {
+      var that = this;
+      return enforcesUnary(function() {
+        return collectArgs(func, that, func.length, [], arguments[0], reverse);
+      });
+    };
+  })();
+}
+
 function adapt(func, arity) {
   function reduce() {
     var args = _.initial(arguments),
@@ -32,6 +67,33 @@ function adapt(func, arity) {
 
   return curry(reduce, arity || func.length);
 }
+
+function eventWatcher(func, node, event) {
+  return function(event) {
+    return func(event, node);
+  }
+}
+
+f.watch = adapt(function(eventName, func, node) {
+  node = f.node(node);
+  func = eventWatcher(func, node);
+  node.addEventListener(eventName, func);
+  return function() {
+    return node.removeEventListener(eventName, func);
+  }
+});
+
+f.trigger = adapt(function(eventName, node) {
+  node = f.node(node);
+  var event = document.createEvent('HTMLEvents');
+  event.initEvent(eventName, true, false);
+  node.dispatchEvent(event);
+  return node;
+});
+
+f.ready = function(func) {
+  document.addEventListener('DOMContentLoaded', func);
+};
 
 (function(funcs) {
   _.forEach(funcs, function(func) {
@@ -66,33 +128,6 @@ f.list = f.l = function(s) {
   } else {
     return _.toArray(document.querySelectorAll(s));
   }
-};
-
-function eventWatcher(func, node, event) {
-  return function(event) {
-    return func(event, node);
-  }
-}
-
-f.watch = adapt(function(eventName, func, node) {
-  node = f.node(node);
-  func = eventWatcher(func, node);
-  node.addEventListener(eventName, func);
-  return function() {
-    return node.removeEventListener(eventName, func);
-  }
-});
-
-f.trigger = adapt(function(eventName, node) {
-  node = f.node(node);
-  var event = document.createEvent('HTMLEvents');
-  event.initEvent(eventName, true, false);
-  node.dispatchEvent(event);
-  return node;
-});
-
-f.ready = function(func) {
-  document.addEventListener('DOMContentLoaded', func);
 };
 
 // Attributes
