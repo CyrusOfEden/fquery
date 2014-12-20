@@ -1,9 +1,19 @@
-f.list = f.l = function(s) {
+f.list = function(s) {
   if (_.isArray(s)) {
-    return s;
+    this.list = s;
   } else if (s instanceof HTMLCollection || s instanceof NodeList) {
-    return _.toArray(s);
+    this.list = _.toArray(s);
   } else {
-    return _.toArray(document.querySelectorAll(s));
+    this.list = _.toArray(document.querySelectorAll(s));
   }
+};
+
+f.list.prototype = {
+  valueOf: function() {
+    return this.list;
+  }
+};
+
+f.l = function(s) {
+  return new f.list(s).valueOf();
 };

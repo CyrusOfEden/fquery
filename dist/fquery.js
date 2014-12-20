@@ -26,7 +26,8 @@ function adapt(func, arity) {
         return res.concat(func.apply(null, args.concat(item)));
       }, []);
     } else {
-      return func.apply(null, arguments);
+      data = (data instanceof Element || data instanceof Text) ? data : document.querySelector(data);
+      return func.apply(null, args.concat(data));
     }
   }
 
@@ -35,17 +36,15 @@ function adapt(func, arity) {
 
 // Attributes
 f.getAttr = adapt(function(attr, node) {
-  return (f.n(node).getAttribute(attr) || '').trim();
+  return (node.getAttribute(attr) || '').trim();
 });
 
 f.setAttr = adapt(function(attr, value, node) {
-  node = f.n(node);
   node.setAttribute(attr, get(value, node));
   return node;
 });
 
 f.removeAttr = adapt(function(attr, node) {
-  node = f.n(node);
   node.removeAttribute(attr);
   return node;
 });
@@ -53,7 +52,6 @@ f.removeAttr = adapt(function(attr, node) {
 // Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   f[func + 'Class'] = adapt(function(klasses, node) {
-    node = f.n(node);
     _.forEach(array(classes), function(klass) {
       node.classList[func](klass);
     });
@@ -62,22 +60,20 @@ _.forEach(['add', 'remove', 'toggle'], function(func) {
 });
 
 f.hasClass = adapt(function(klasses, node) {
-  node = f.n(node);
   return _.all(f.array(klasses), function(klass) {
     return node.classList.contains(klass);
   });
 });
 
 f.getClass = adapt(function(klasses, node) {
-  return _.toArray(f.n(node).classList);
+  return _.toArray(node.classList);
 });
 
 f.getStyle = adapt(function(property, node) {
-  return getComputedStyle(f.n(node))[property];
+  return getComputedStyle(node)[property];
 });
 
 f.setStyle = adapt(function(property, value, node) {
-  node = f.n(node);
   node.style[property] = get(value, node);
   return node;
 });
@@ -87,7 +83,7 @@ f.show = f.setStyle('display', '');
 
 // Data
 f.getData = adapt(function(attr, node) {
-  return f.getAttr('data-' + attr, node).trim();
+  return f.getAttr('data-' + attr, node);
 });
 
 f.setData = adapt(function(attr, value, node) {
@@ -105,7 +101,6 @@ function eventWatcher(func, node, event) {
 }
 
 f.watch = adapt(function(eventName, func, node) {
-  node = f.n(node);
   func = eventWatcher(func, node);
   node.addEventListener(eventName, func);
   return function() {
@@ -114,7 +109,6 @@ f.watch = adapt(function(eventName, func, node) {
 });
 
 f.trigger = adapt(function(eventName, node) {
-  node = f.n(node);
   var event = document.createEvent('HTMLEvents');
   event.initEvent(eventName, true, false);
   node.dispatchEvent(event);
@@ -127,28 +121,26 @@ f.ready = function(func) {
 
 // HTML
 f.getHTML = adapt(function(node) {
-  return f.n(node).innerHTML.trim();
+  return node.innerHTML.trim();
 });
 
 f.setHTML = adapt(function(value, node) {
-  node = f.n(node);
   node.innerHTML = get(value, node);
   return node;
 });
 
 f.getOuterHTML = adapt(function(node) {
-  return f.n(node).outerHTML;
+  return node.outerHTML;
 });
 
 f.setOuterHTML = adapt(function(value, node) {
-  node = f.n(node);
   node.outerHTML = get(value, node);
   return node;
 });
 
 // Layout
 f.offset = adapt(function(node) {
-  var rect = f.n(node).getBoundingClientRect();
+  var rect = node.getBoundingClientRect();
   return {
     top: rect.top + document.body.scrollTop,
     left: rect.left + document.body.scrollLeft
@@ -156,7 +148,6 @@ f.offset = adapt(function(node) {
 });
 
 f.position = adapt(function(node) {
-  node = f.n(node);
   return {
     top: node.offsetTop,
     left: node.offsetLeft
@@ -164,49 +155,54 @@ f.position = adapt(function(node) {
 });
 
 f.outerHeight = adapt(function(node) {
-  return f.n(node).offsetHeight;
+  return node.offsetHeight;
 });
 
 f.outerWidth = adapt(function(node) {
-  return f.n(node).offsetWidth;
+  return node.offsetWidth;
 });
 
-f.list = f.l = function(s) {
+f.list = function(s) {
   if (_.isArray(s)) {
-    return s;
+    this.list = s;
   } else if (s instanceof HTMLCollection || s instanceof NodeList) {
-    return _.toArray(s);
+    this.list = _.toArray(s);
   } else {
-    return _.toArray(document.querySelectorAll(s));
+    this.list = _.toArray(document.querySelectorAll(s));
   }
 };
 
+f.list.prototype = {
+  valueOf: function() {
+    return this.list;
+  }
+};
+
+f.l = function(s) {
+  return new f.list(s).valueOf();
+};
+
 f.remove = adapt(function(node) {
-  node = f.n(node);
   node.parentNode.removeChild(node);
   return node;
 });
 
 f.insertAfter = adapt(function(value, node) {
-  node = f.n(node);
   node.insertAdjacentHTML('afterend', get(value, node));
   return node;
 });
 
 f.insertBefore = adapt(function(value, node) {
-  node = f.n(node);
   node.insertAdjacentHTML('beforebegin', get(value, node));
   return node;
 });
 
 f.append = adapt(function(value, node) {
-  node = f.n(node);
   node.insertAdjacentHTML('afterbegin', get(value, node));
   return node;
 });
 
 f.prepend = adapt(function(value, node) {
-  node = f.n(node);
   node.insertAdjacentHTML('beforend', get(value, node));
   return node;
 });
@@ -239,40 +235,46 @@ f.textMatch = curry(function(regex, node) {
   return regex.test(f.getText(node))
 });
 
-f.node = f.n = function(s) {
-  return (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
+f.node = function(s) {
+  this.node = (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
+};
+
+f.node.prototype = {
+  valueOf: function() {
+    return this.node;
+  }
+};
+
+f.n = function(s) {
+  return new f.node(s).valueOf();
 };
 
 // Properties
 f.getProp = adapt(function(prop, node) {
-  return (f.n(node)[prop] || '').trim();
+  return (node[prop] || '').trim();
 });
 
 f.setProp = adapt(function(prop, value, node) {
-  node = f.n(node);
   node[prop] = get(value, node);
   return node;
 });
 
 f.removeProp = adapt(function(prop, node) {
-  node = f.n(node);
   delete node[prop];
   return node;
 });
 
 // Text
 f.getText = adapt(function(node) {
-  return (f.n(node).textContent || '').trim();
+  return (node.textContent || '').trim();
 });
 
 f.setText = adapt(function(value, node) {
-  node = f.n(node);
   node.textContent = get(value, node);
   return node;
 });
 
 f.siblings = adapt(function(node) {
-  node = f.n(node);
   var siblings = [];
   for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
     if (n.nodeType === 1 && n !== node) {
@@ -283,12 +285,16 @@ f.siblings = adapt(function(node) {
 });
 
 f.children = adapt(function(node) {
-  return f.siblings(f.n(node).firstChild);
+  return f.siblings(node.firstChild);
 });
 
 f.parent = adapt(function(node) {
-  var parent = f.n(node).parentNode;
+  var parent = node.parentNode;
   return parent && parent.nodeType !== 11 ? parent : null;
+});
+
+f.find = adapt(function(s, node) {
+  return node.querySelectorAll(s);
 });
 
 

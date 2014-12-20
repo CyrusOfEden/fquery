@@ -17,7 +17,8 @@ function adapt(func, arity) {
         return res.concat(func.apply(null, args.concat(item)));
       }, []);
     } else {
-      return func.apply(null, arguments);
+      data = (data instanceof Element || data instanceof Text) ? data : document.querySelector(data);
+      return func.apply(null, args.concat(data));
     }
   }
 

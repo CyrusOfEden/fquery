@@ -1,6 +1,6 @@
 // Data
 f.getData = adapt(function(attr, node) {
-  return f.getAttr('data-' + attr, node).trim();
+  return f.getAttr('data-' + attr, node);
 });
 
 f.setData = adapt(function(attr, value, node) {
