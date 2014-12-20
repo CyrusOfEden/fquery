@@ -1,5 +1,5 @@
 f.equal = curry(function(node, test) {
-  return f.node(node) === f.node(test);
+  return f.n(node) === f.n(test);
 });
 
 f.attrEqual = curry(function(attr, value, node) {

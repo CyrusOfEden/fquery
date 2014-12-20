@@ -5,7 +5,7 @@ function eventWatcher(func, node, event) {
 }
 
 f.watch = adapt(function(eventName, func, node) {
-  node = f.node(node);
+  node = f.n(node);
   func = eventWatcher(func, node);
   node.addEventListener(eventName, func);
   return function() {
@@ -14,7 +14,7 @@ f.watch = adapt(function(eventName, func, node) {
 });
 
 f.trigger = adapt(function(eventName, node) {
-  node = f.node(node);
+  node = f.n(node);
   var event = document.createEvent('HTMLEvents');
   event.initEvent(eventName, true, false);
   node.dispatchEvent(event);

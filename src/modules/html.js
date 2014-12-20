@@ -1,20 +1,20 @@
 // HTML
 f.getHTML = adapt(function(node) {
-  return f.node(node).innerHTML.trim();
+  return f.n(node).innerHTML.trim();
 });
 
 f.setHTML = adapt(function(value, node) {
-  node = f.node(node);
+  node = f.n(node);
   node.innerHTML = get(value, node);
   return node;
 });
 
 f.getOuterHTML = adapt(function(node) {
-  return f.node(node).outerHTML;
+  return f.n(node).outerHTML;
 });
 
 f.setOuterHTML = adapt(function(value, node) {
-  node = f.node(node);
+  node = f.n(node);
   node.outerHTML = get(value, node);
   return node;
 });
