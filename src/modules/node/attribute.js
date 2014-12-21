@@ -1,14 +1,14 @@
 // Attributes
-f.getAttr = adapt(function(attr, node) {
+n.getAttr = function(attr, node) {
   return (node.getAttribute(attr) || '').trim();
-});
+};
 
-f.setAttr = adapt(function(attr, value, node) {
+n.setAttr = function(attr, value, node) {
   node.setAttribute(attr, get(value, node));
   return node;
-});
+};
 
-f.removeAttr = adapt(function(attr, node) {
+n.removeAttr = function(attr, node) {
   node.removeAttribute(attr);
   return node;
-});
+};

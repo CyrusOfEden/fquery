@@ -1,10 +1,10 @@
-var n, i, path;
+var v, i, path;
 
 path = document.location.pathname;
 
-n = 10000;
+v = 10000;
 console.time('jQuery');
-while (--n) {
+while (--v) {
   $('.six-columns.text-container');
 
   $('.navbar a').filter(function() {
@@ -35,27 +35,26 @@ while (--n) {
 }
 console.timeEnd('jQuery');
 
-n = 10000;
+v = 10000;
 console.time('fQuery');
-while (--n) {
-  f.l('.six-columns.text-container');
+while (--v) {
+  c.q('.six-columns.text-container');
 
-  _.select(f.l('.navbar a'), f.attrEqual('href', path));
+  _.select(c.q('.navbar a'), n.attrEqual('href', path));
 
-  f.offset(f.l('p.lead'));
+  c.offset(c.q('p.lead'));
 
-  f.toggleClass('lead', f.l('lead'));
+  c.toggleClass('lead', c.q('lead'));
 
-  _.filter(f.l('.navbar a'), f.hasClass('active'));
+  _.filter(c.q('.navbar a'), n.hasClass('active'));
 
-  var list = f.l('p.lead');
-  _.map(f.getText(list), f.setData('content'));
+  _.map(c.getText(c.q('p.lead')), n.setData('content'));
 
-  f.children(f.l('.inner'));
+  c.children(c.q('.inner'));
 
-  _.forEach(f.l('.navbar a'), function(node) {
-    var unwatch = f.watch('mouseover', _.noop, node);
-    f.trigger('mouseover', node);
+  _.forEach(c.q('.navbar a'), function(node) {
+    var unwatch = n.watch('mouseover', _.noop, node);
+    n.trigger('mouseover', node);
     unwatch();
   });
 }

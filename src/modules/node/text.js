@@ -1,9 +1,9 @@
 // Text
-f.getText = adapt(function(node) {
+n.getText = function(node) {
   return (node.textContent || '').trim();
-});
+};
 
-f.setText = adapt(function(value, node) {
+n.setText = function(value, node) {
   node.textContent = get(value, node);
   return node;
-});
+};

@@ -1,5 +1,5 @@
 // Traversal
-f.siblings = adapt(function(node) {
+n.siblings = function(node) {
   var siblings = [];
   for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
     if (n.nodeType === 1 && n !== node) {
@@ -7,17 +7,17 @@ f.siblings = adapt(function(node) {
     }
   }
   return siblings;
-});
+};
 
-f.children = adapt(function(node) {
-  return f.siblings(node.firstChild);
-});
+n.children = function(node) {
+  return n.siblings(node.firstChild);
+};
 
-f.parent = adapt(function(node) {
+n.parent = function(node) {
   var parent = node.parentNode;
   return parent && parent.nodeType !== 11 ? parent : null;
-});
+};
 
-f.find = adapt(function(s, node) {
+n.find = function(s, node) {
   return node.querySelectorAll(s);
-});
+};
