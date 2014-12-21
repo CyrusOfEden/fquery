@@ -26,7 +26,6 @@ function adapt(func, arity) {
         return res.concat(func.apply(null, args.concat(item)));
       }, []);
     } else {
-      data = (data instanceof Element || data instanceof Text) ? data : document.querySelector(data);
       return func.apply(null, args.concat(data));
     }
   }
@@ -60,7 +59,7 @@ _.forEach(['add', 'remove', 'toggle'], function(func) {
 });
 
 f.hasClass = adapt(function(klasses, node) {
-  return _.all(f.array(klasses), function(klass) {
+  return _.all(array(klasses), function(klass) {
     return node.classList.contains(klass);
   });
 });
@@ -164,22 +163,22 @@ f.outerWidth = adapt(function(node) {
 
 f.list = function(s) {
   if (_.isArray(s)) {
-    this.list = s;
+    this.value = s;
   } else if (s instanceof HTMLCollection || s instanceof NodeList) {
-    this.list = _.toArray(s);
+    this.value = _.toArray(s);
   } else {
-    this.list = _.toArray(document.querySelectorAll(s));
+    this.value = _.toArray(document.querySelectorAll(s));
   }
 };
 
 f.list.prototype = {
   valueOf: function() {
-    return this.list;
+    return this.value;
   }
 };
 
 f.l = function(s) {
-  return new f.list(s).valueOf();
+  return new f.list(s).value;
 };
 
 f.remove = adapt(function(node) {
@@ -236,17 +235,17 @@ f.textMatch = curry(function(regex, node) {
 });
 
 f.node = function(s) {
-  this.node = (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
+  this.value = (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
 };
 
 f.node.prototype = {
   valueOf: function() {
-    return this.node;
+    return this.value;
   }
 };
 
 f.n = function(s) {
-  return new f.node(s).valueOf();
+  return new f.node(s).value;
 };
 
 // Properties
@@ -274,6 +273,7 @@ f.setText = adapt(function(value, node) {
   return node;
 });
 
+// Traversal
 f.siblings = adapt(function(node) {
   var siblings = [];
   for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
