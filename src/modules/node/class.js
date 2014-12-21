@@ -1,7 +1,7 @@
 // Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(array(classes), function(klass) {
+    _.forEach(array(klasses), function(klass) {
       node.classList[func](klass);
     });
     return node;

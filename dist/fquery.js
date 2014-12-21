@@ -35,7 +35,7 @@ n.removeAttr = function(attr, node) {
 // Class
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(array(classes), function(klass) {
+    _.forEach(array(klasses), function(klass) {
       node.classList[func](klass);
     });
     return node;
@@ -149,23 +149,41 @@ n.remove = function(node) {
   return node;
 };
 
+n.clone = function(node) {
+  return node.cloneNode(true);
+};
+
+n.node = function(tag, text) {
+  var node = document.createElement(tag);
+  node.appendChild(_.isString(text) ? document.createTextNode(text) : text);
+  return node;
+};
+
+n.fragment = function() {
+  return document.createDocumentFragment();
+};
+
 n.insertAfter = function(value, node) {
-  node.insertAdjacentHTML('afterend', get(value, node));
+  node.parentNode.insertBefore(get(value, node), node.nextSibling);
   return node;
 };
 
 n.insertBefore = function(value, node) {
-  node.insertAdjacentHTML('beforebegin', get(value, node));
+  node.parentNode.insertBefore(get(value, node), node);
   return node;
 };
 
 n.append = function(value, node) {
-  node.insertAdjacentHTML('afterbegin', get(value, node));
+  node.appendChild(get(value, node));
   return node;
 };
 
 n.prepend = function(value, node) {
-  node.insertAdjacentHTML('beforend', get(value, node));
+  if (node.childNodes[1]) {
+    node.insertBefore(get(value, node), node.childNodes[1]);
+  } else {
+    n.append(value, node);
+  }
   return node;
 };
 
@@ -195,6 +213,10 @@ n.textEqual = function(value, node) {
 
 n.textMatch = function(regex, node) {
   return regex.test(n.getText(node))
+};
+
+n.tagMatch = function(tag, node) {
+  return tag === node.tagName;
 };
 
 n.q = function(s) {

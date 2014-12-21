@@ -25,3 +25,7 @@ n.textEqual = function(value, node) {
 n.textMatch = function(regex, node) {
   return regex.test(n.getText(node))
 };
+
+n.tagMatch = function(tag, node) {
+  return tag === node.tagName;
+};
