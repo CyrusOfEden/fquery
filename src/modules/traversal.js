@@ -1,3 +1,4 @@
+// Traversal
 f.siblings = adapt(function(node) {
   var siblings = [];
   for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
