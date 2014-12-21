@@ -9,7 +9,11 @@ var wrap = require('gulp-wrap');
 var del = require('del');
 
 var config = {
-  src: ['src/modules/utils.js', 'src/modules/node/**/*.js', 'src/modules/collection/**/*.js'],
+  src: [
+    'src/modules/*.js',
+    'src/modules/node/**/*.js',
+    'src/modules/collection/**/*.js'
+  ],
   dist: 'dist/',
   template: 'src/fquery.js',
   outdev: 'fquery.js',

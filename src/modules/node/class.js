@@ -9,7 +9,9 @@ _.forEach(['add', 'remove', 'toggle'], function(func) {
 });
 
 n.hasClass = function(klasses, node) {
-  return node.classList.contains(klass);
+  return _.any(array(klasses), function(klass) {
+    return node.classList.contains(klass);
+  });
 };
 
 n.getClass = function(klasses, node) {
