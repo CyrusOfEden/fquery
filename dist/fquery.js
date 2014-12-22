@@ -191,7 +191,7 @@ n.watch = function(name, func, node) {
  */
 n.trigger = function(name, node) {
   var event = document.createEvent('HTMLEvents');
-  event.initEvent(eventName, true, false);
+  event.initEvent(name, true, false);
   node.dispatchEvent(event);
   return node;
 };
