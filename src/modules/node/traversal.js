@@ -25,7 +25,7 @@ n.children = function(node) {
 // Retrieve an `Element`'s parent.
 /**
  * @param {Element} node - the node
- * @returns {Element, null} the parent node or null
+ * @returns {Element} the parent node (or null)
  */
 n.parent = function(node) {
   var parent = node.parentNode;

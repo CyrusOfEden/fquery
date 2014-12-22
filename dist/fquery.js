@@ -20,17 +20,6 @@ function get(f, x) {
   return _.isFunction(f) ? f(x) : f;
 }
 
-/**
- * Wrap `f` in an array if it's not already an array.
- *
- * @private
- * @param {Any} f - an array or a value
- * @returns {Array} the equivalent of `_.flatten([f])`
- */
-function array(f) {
-  return _.isArray(f) ? f : [f];
-}
-
 /* Local variable for the `lodash` or `underscore-contrib` curry function. */
 var curry = _.curry;
 
@@ -74,13 +63,13 @@ n.removeAttr = function(attr, node) {
 /**
  * Add, remove, or toggle classes.
  *
- * @param {String, Array} klasses - classes to add/remove/toggle
+ * @param {Array<String>} klasses - classes to add/remove/toggle
  * @param {Element} node - the element to modify
  * @returns {Element} node
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(array(klasses), function(klass) {
+    _.forEach(klasses, function(klass) {
       node.classList[func](klass);
     });
     return node;
@@ -90,12 +79,12 @@ _.forEach(['add', 'remove', 'toggle'], function(func) {
 /**
  * Check to see if an element has _all_ the provided classes.
  *
- * @param {String, Array} klasses - classes to presence of
+ * @param {Array<String>} klasses - classes to check presence of
  * @param {Element} node - the element to modify
  * @returns {Boolean} the presence of all the classes
  */
 n.hasClass = function(klasses, node) {
-  return _.all(array(klasses), function(klass) {
+  return _.all(klasses, function(klass) {
     return node.classList.contains(klass);
   });
 };
@@ -104,7 +93,7 @@ n.hasClass = function(klasses, node) {
  * Return an `Element`'s classes
  *
  * @param {Element} node - the element to modify
- * @returns {Array} the element's classes
+ * @returns {Array<String>} the element's classes
  */
 n.getClass = function(node) {
   return _.toArray(node.classList);
@@ -511,8 +500,8 @@ n.tagMatch = function(tag, node) {
  * Passes through `s` if it's an Element or a Text node, or uses
  * `document.querySelector` to retrieve the element.
  *
- * @param {Element, Text, String} s - an `Element` or `Text` node or a selector
- * @returns {Element, null} the passed through `s` or the element
+ * @param {Any} s - an `Element` or `Text` node or a selector
+ * @returns {Element} the passed through `s` or the element (or null)
  */
 n.q = function(s) {
   return (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
@@ -599,7 +588,7 @@ n.children = function(node) {
 // Retrieve an `Element`'s parent.
 /**
  * @param {Element} node - the node
- * @returns {Element, null} the parent node or null
+ * @returns {Element} the parent node (or null)
  */
 n.parent = function(node) {
   var parent = node.parentNode;
@@ -611,9 +600,9 @@ n.parent = function(node) {
  * returns `s` as an array if `s` is an `HTMLCollection` or a `NodeList`,
  * or performs returns an array of `document.querySelectorAll`.
  *
- * @param {Array, HTMLCollection, NodeList, String} s - an array-like object of `Element`s or a CSS selector
+ * @param {Any} s - an array-like object of `Element`s or a CSS selector
  * @param {Element} c - the context for `querySelectorAll`
- * @returns {Array} the matched elements
+ * @returns {Array<Element>} the matched elements
  */
 c.q = function(s, c) {
   if (_.isArray(s)) {
