@@ -4,6 +4,7 @@
   // Used as a reference to the global object
   var root = window || this;
 
+  // Set up namespaces
   var n = {};
   var c = {};
 
