@@ -654,13 +654,9 @@ _.forEach(n, function(func, name) {
     root.n = n;
     root.c = c;
     // define as an anonymous module so, through path mapping, it can be
-    // referenced as the "underscore" module
-    define(function() {
-      return c;
-    });
-    define(function() {
-      return n;
-    });
+    // referenced as the "fQuery" module
+    define(function() { return c; });
+    define(function() { return n; });
   } else {
     // in a browser or Rhino
     root.n = n;
