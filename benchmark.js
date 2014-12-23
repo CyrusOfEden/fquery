@@ -48,7 +48,7 @@ while (--v) {
 
   _.filter(c.q('.navbar a'), n.hasClass('active'));
 
-  _.map(c.p('p.lead'), function(node) {
+  _.map(c.q('p.lead'), function(node) {
     n.setData('content-length', n.getText(node).length, node);
   });
 
