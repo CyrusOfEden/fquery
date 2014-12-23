@@ -22,6 +22,7 @@ while (--v) {
   $('p.lead').each(function() {
     var $this = $(this);
     $this.data('content-length', $this.text().length);
+  });
 
   $('.inner').children();
 
