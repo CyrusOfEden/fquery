@@ -21,8 +21,7 @@ while (--v) {
 
   $('p.lead').each(function() {
     var $this = $(this);
-    $this.data('content') = $this.text();
-  });
+    $this.data('content-length', $this.text().length);
 
   $('.inner').children();
 
@@ -48,7 +47,9 @@ while (--v) {
 
   _.filter(c.q('.navbar a'), n.hasClass('active'));
 
-  _.map(c.getText(c.q('p.lead')), n.setData('content'));
+  _.map(c.p('p.lead'), function(node) {
+    n.setData('content-length', n.getText(node).length, node);
+  });
 
   c.children(c.q('.inner'));
 
