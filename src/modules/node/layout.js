@@ -1,5 +1,5 @@
 /**
- * Get the position of an element relative to the document.
+ * Get the position of an element relative to the d.
  *
  * @param {Element} node - the node
  * @returns {Object} the top and left offsets of the node
@@ -7,8 +7,8 @@
 n.offset = function(node) {
   var rect = node.getBoundingClientRect();
   return {
-    top: rect.top + document.body.scrollTop,
-    left: rect.left + document.body.scrollLeft
+    top: rect.top + d.body.scrollTop,
+    left: rect.left + d.body.scrollLeft
   };
 };
 

@@ -1,4 +1,4 @@
-fquery.js
+fQuery.js
 =========
 
-Functional DOM manipulation.
+For when you want to manipulate the DOM but would rather have a functional syntax.

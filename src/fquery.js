@@ -4,9 +4,13 @@
   // Used as a reference to the global object
   var root = window || this;
 
+  // Quick reference to `document`
+  var d = window.document;
+
   // Set up namespaces
   var n = {};
   var c = {};
+  var u = {};
 
 <%= contents %>
 
@@ -17,13 +21,16 @@
     // See http://requirejs.org/docs/api.html#config-shim
     root.n = n;
     root.c = c;
+    root.u = u;
     // define as an anonymous module so, through path mapping, it can be
     // referenced as the "fQuery" module
-    define(function() { return c; });
     define(function() { return n; });
+    define(function() { return c; });
+    define(function() { return u; });
   } else {
     // in a browser or Rhino
     root.n = n;
     root.c = c;
+    root.u = u;
   }
 }).call(this);

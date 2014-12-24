@@ -36,7 +36,7 @@ n.watch = function(name, func, node) {
  * @returns {Element} the ndoe
  */
 n.trigger = function(name, node) {
-  var event = document.createEvent('HTMLEvents');
+  var event = d.createEvent('HTMLEvents');
   event.initEvent(name, true, false);
   node.dispatchEvent(event);
   return node;

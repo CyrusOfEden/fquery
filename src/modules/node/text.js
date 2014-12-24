@@ -1,5 +1,6 @@
-// Get the text content of an `Element`.
 /**
+ * Get the text content of an `Element`.
+ *
  * @param {Element} node - the node
  * @returns {Element} the text content of the node
  */
@@ -7,8 +8,9 @@ n.getText = function(node) {
   return (node.textContent || '').trim();
 };
 
-// Set the text content of an `Element`.
 /**
+ * Set the text content of an `Element`.
+ *
  * @param {Any} value - the node's new text content
  * @param {Element} node - the node
  * @returns {Element} the node

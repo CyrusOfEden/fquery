@@ -9,6 +9,51 @@ n.equal = function(node, test) {
   return node === test;
 };
 
+/* Find the compatible matcher */
+var matcher = _.find([
+  "matches",
+  "matchesSelector",
+  "msMatchesSelector",
+  "mozMatchesSelector",
+  "webkitMatchesSelector",
+  "oMatchesSelector"
+], function(method) {
+  return testNode[method] != null;
+});
+
+/**
+ * Check if a node matches a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.matches = function(s, node) {
+  return node[matcher](s);
+};
+
+/**
+ * Check if a node doesn't matches a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.not = function(s, node) {
+  return !node[matcher](s);
+};
+
+/**
+ * Check if a node has any descendents matching a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.has = function(s, node) {
+  return _.any(c.q(s, node));
+};
+
 /**
  * Check to see if the value of an attribute matches a predicate.
  *

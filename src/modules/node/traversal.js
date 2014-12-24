@@ -1,5 +1,6 @@
-// Retrieve an `Element`'s siblings.
 /**
+ * Retrieve an `Element`'s siblings.
+ *
  * @param {Element} node - the node
  * @returns {Array<Element>} the node's siblings
  */
@@ -13,8 +14,9 @@ n.siblings = function(node) {
   return siblings;
 };
 
-// Retrieve an `Element`'s children.
 /**
+ * Retrieve an `Element`'s children.
+ *
  * @param {Element} node - the node
  * @returns {Array<Element>} the node's children
  */
@@ -22,8 +24,9 @@ n.children = function(node) {
   return n.siblings(node.firstChild);
 };
 
-// Retrieve an `Element`'s parent.
 /**
+ * Retrieve an `Element`'s parent.
+ *
  * @param {Element} node - the node
  * @returns {Element} the parent node (or null)
  */

@@ -12,3 +12,6 @@ function get(f, x) {
 
 /* Local variable for the `lodash` or `underscore-contrib` curry function. */
 var curry = _.curry;
+
+/* Test node for feature checking */
+var testNode = d.createElement('div');

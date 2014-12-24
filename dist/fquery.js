@@ -4,9 +4,13 @@
   // Used as a reference to the global object
   var root = window || this;
 
+  // Quick reference to `document`
+  var d = window.document;
+
   // Set up namespaces
   var n = {};
   var c = {};
+  var u = {};
 
 /**
  * Return `f(x)` if `f` is a function, otherwise just `f`.
@@ -22,6 +26,51 @@ function get(f, x) {
 
 /* Local variable for the `lodash` or `underscore-contrib` curry function. */
 var curry = _.curry;
+
+/* Test node for feature checking */
+var testNode = d.createElement('div');
+
+function requestSuccess(request) {
+  return request.status >= 200 && request.status < 400;
+}
+
+function ajax(type, url, options) {
+  return _.tap(new XMLHttpRequest(), function(request) {
+    request.open(type.toUpperCase(), url, true);
+    if (options.then) {
+      request.onreadystatechange = function() {
+        if (request.readyState !== 4) return;
+        options.then(requestSuccess(request), request.responseText, request);
+      }
+    } else {
+      request.onreadystatechange = function() {
+        if (request.readyState !== 4) return;
+        var success = requestSuccess(request);
+        if (success && options.success) {
+          options.success(request.responseText, request);
+        } else if (options.error) {
+          options.error(request.statusText, request);
+        }
+      }
+    }
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+    _.forEach(options.header || {}, function(value, key) {
+      request.setRequestHeader(key, value);
+    });
+    request.send(options.data || "");
+  });
+};
+
+u.ajax = _.curry(ajax);
+
+u.get = u.ajax('get');
+u.post = u.ajax('post');
+u.put = u.ajax('put');
+u.patch = u.ajax('patch');
+u.delete = u.ajax('delete');
+
+u.head = u.ajax('head');
+u.options = u.ajax('options');
 
 /**
  * Returns an attribute of an `Element`.
@@ -190,7 +239,7 @@ n.watch = function(name, func, node) {
  * @returns {Element} the ndoe
  */
 n.trigger = function(name, node) {
-  var event = document.createEvent('HTMLEvents');
+  var event = d.createEvent('HTMLEvents');
   event.initEvent(name, true, false);
   node.dispatchEvent(event);
   return node;
@@ -240,8 +289,27 @@ n.setOuterHTML = function(value, node) {
   return node;
 };
 
+// Gets the value of an input.
 /**
- * Get the position of an element relative to the document.
+ * @param {Element} node - the node
+ * @returns {Any} the value of the property
+ */
+n.getValue = function(node) {
+  return n.getProp('value', node);
+};
+
+// Sets the value of an input.
+/**
+ * @param {Any} value - the property's new value
+ * @param {Element} node - the node
+ * @returns {Element} the node
+ */
+n.setValue = function(value, node) {
+  return n.setProp('value', value, node);
+};
+
+/**
+ * Get the position of an element relative to the d.
  *
  * @param {Element} node - the node
  * @returns {Object} the top and left offsets of the node
@@ -249,8 +317,8 @@ n.setOuterHTML = function(value, node) {
 n.offset = function(node) {
   var rect = node.getBoundingClientRect();
   return {
-    top: rect.top + document.body.scrollTop,
-    left: rect.left + document.body.scrollLeft
+    top: rect.top + d.body.scrollTop,
+    left: rect.left + d.body.scrollLeft
   };
 };
 
@@ -316,8 +384,8 @@ n.clone = function(node) {
  * @returns {Element} the new node
  */
 n.node = function(tag, text) {
-  var node = document.createElement(tag);
-  node.appendChild(_.isString(text) ? document.createTextNode(text) : text);
+  var node = d.createElement(tag);
+  node.appendChild(_.isString(text) ? d.createTextNode(text) : text);
   return node;
 };
 
@@ -327,7 +395,7 @@ n.node = function(tag, text) {
  * @returns {DocumentFragment} a new document fragment
  */
 n.fragment = function() {
-  return document.createDocumentFragment();
+  return d.createDocumentFragment();
 };
 
 /**
@@ -389,6 +457,51 @@ n.prepend = function(value, node) {
  */
 n.equal = function(node, test) {
   return node === test;
+};
+
+/* Find the compatible matcher */
+var matcher = _.find([
+  "matches",
+  "matchesSelector",
+  "msMatchesSelector",
+  "mozMatchesSelector",
+  "webkitMatchesSelector",
+  "oMatchesSelector"
+], function(method) {
+  return testNode[method] != null;
+});
+
+/**
+ * Check if a node matches a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.matches = function(s, node) {
+  return node[matcher](s);
+};
+
+/**
+ * Check if a node doesn't matches a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.not = function(s, node) {
+  return !node[matcher](s);
+};
+
+/**
+ * Check if a node has any descendents matching a selector.
+ *
+ * @param {Any} s - the selector
+ * @param {Element} node - the node
+ * @returns {Boolean} whether the node has any descendents matching the selector
+ */
+n.has = function(s, node) {
+  return _.any(c.q(s, node));
 };
 
 /**
@@ -498,18 +611,19 @@ n.tagMatch = function(tag, node) {
 
 /**
  * Passes through `s` if it's an Element or a Text node, or uses
- * `document.querySelector` to retrieve the element.
+ * `d.querySelector` to retrieve the element.
  *
  * @param {Any} s - an `Element` or `Text` node or a selector
  * @returns {Element} the passed through `s` or the element (or null)
  */
-n.q = function(s) {
-  return (s instanceof Element || s instanceof Text) ? s : document.querySelector(s);
+n.q = function(s, n) {
+  return (s instanceof Element || s instanceof Text) ? s : (n || d).querySelector(s);
 };
 
-// Returns a property of an `Element`.
-// For example, the `checked` property on checkboxes.
 /**
+ * Returns a property of an `Element`.
+ * For example, the `checked` property on checkboxes.
+ *
  * @param {String} prop - the name of the property to get
  * @param {Element} node - the node
  * @returns {String} the value of the property
@@ -518,8 +632,9 @@ n.getProp = function(prop, node) {
   return (node[prop] || '').trim();
 };
 
-// Sets the property of an `Element`.
 /**
+ * Sets the property of an `Element`.
+ *
  * @param {String} prop - the name of the property to set
  * @param {Any} value - the property's new value
  * @param {Element} node - the node
@@ -530,8 +645,9 @@ n.setProp = function(prop, value, node) {
   return node;
 };
 
-// Removes a property of an `Element`.
 /**
+ * Removes a property of an `Element`.
+ *
  * @param {String} prop - the name of the property to remove
  * @param {Element} node - the node
  * @returns {Element} the node
@@ -541,8 +657,9 @@ n.removeProp = function(prop, node) {
   return node;
 };
 
-// Get the text content of an `Element`.
 /**
+ * Get the text content of an `Element`.
+ *
  * @param {Element} node - the node
  * @returns {Element} the text content of the node
  */
@@ -550,8 +667,9 @@ n.getText = function(node) {
   return (node.textContent || '').trim();
 };
 
-// Set the text content of an `Element`.
 /**
+ * Set the text content of an `Element`.
+ *
  * @param {Any} value - the node's new text content
  * @param {Element} node - the node
  * @returns {Element} the node
@@ -561,8 +679,9 @@ n.setText = function(value, node) {
   return node;
 };
 
-// Retrieve an `Element`'s siblings.
 /**
+ * Retrieve an `Element`'s siblings.
+ *
  * @param {Element} node - the node
  * @returns {Array<Element>} the node's siblings
  */
@@ -576,8 +695,9 @@ n.siblings = function(node) {
   return siblings;
 };
 
-// Retrieve an `Element`'s children.
 /**
+ * Retrieve an `Element`'s children.
+ *
  * @param {Element} node - the node
  * @returns {Array<Element>} the node's children
  */
@@ -585,8 +705,9 @@ n.children = function(node) {
   return n.siblings(node.firstChild);
 };
 
-// Retrieve an `Element`'s parent.
 /**
+ * Retrieve an `Element`'s parent.
+ *
  * @param {Element} node - the node
  * @returns {Element} the parent node (or null)
  */
@@ -598,7 +719,7 @@ n.parent = function(node) {
 /**
  * Passes through `s` if it's an Array,
  * returns `s` as an array if `s` is an `HTMLCollection` or a `NodeList`,
- * or performs returns an array of `document.querySelectorAll`.
+ * or performs returns an array of `d.querySelectorAll`.
  *
  * @param {Any} s - an array-like object of `Element`s or a CSS selector
  * @param {Element} c - the context for `querySelectorAll`
@@ -610,7 +731,7 @@ c.q = function(s, c) {
   } else if (s instanceof HTMLCollection || s instanceof NodeList) {
     return _.toArray(s);
   } else {
-    return _.toArray((c || document).querySelectorAll(s));
+    return _.toArray((c || d).querySelectorAll(s));
   }
 };
 
@@ -641,13 +762,16 @@ _.forEach(n, function(func, name) {
     // See http://requirejs.org/docs/api.html#config-shim
     root.n = n;
     root.c = c;
+    root.u = u;
     // define as an anonymous module so, through path mapping, it can be
     // referenced as the "fQuery" module
-    define(function() { return c; });
     define(function() { return n; });
+    define(function() { return c; });
+    define(function() { return u; });
   } else {
     // in a browser or Rhino
     root.n = n;
     root.c = c;
+    root.u = u;
   }
 }).call(this);

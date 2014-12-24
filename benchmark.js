@@ -40,7 +40,7 @@ console.time('fQuery');
 while (--v) {
   c.q('.six-columns.text-container');
 
-  _.select(c.q('.navbar a'), n.attrEqual('href', path));
+  _.find(c.q('.navbar a'), n.attrEqual('href', path));
 
   c.offset(c.q('p.lead'));
 

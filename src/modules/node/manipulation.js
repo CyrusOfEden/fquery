@@ -27,8 +27,8 @@ n.clone = function(node) {
  * @returns {Element} the new node
  */
 n.node = function(tag, text) {
-  var node = document.createElement(tag);
-  node.appendChild(_.isString(text) ? document.createTextNode(text) : text);
+  var node = d.createElement(tag);
+  node.appendChild(_.isString(text) ? d.createTextNode(text) : text);
   return node;
 };
 
@@ -38,7 +38,7 @@ n.node = function(tag, text) {
  * @returns {DocumentFragment} a new document fragment
  */
 n.fragment = function() {
-  return document.createDocumentFragment();
+  return d.createDocumentFragment();
 };
 
 /**
