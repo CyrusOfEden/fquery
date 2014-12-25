@@ -24,34 +24,29 @@ function get(f, x) {
   return _.isFunction(f) ? f(x) : f;
 }
 
-/* Local variable for the `lodash` or `underscore-contrib` curry function. */
+/* Local variable for the Lo-Dash or Underscore-Contrib curry function. */
 var curry = _.curry;
 
 /* Test node for feature checking */
 var testNode = d.createElement('div');
 
+/* Underscore/Lo-Dash mixins */
+// _.mixin({
+//   concat: function() {
+//     return Array.prototype.concat.apply([], arguments);
+//   }
+// });
+
 function requestSuccess(request) {
   return request.status >= 200 && request.status < 400;
 }
 
-function ajax(type, url, options) {
+u.ajax = curry(function(type, func, options) {
   return _.tap(new XMLHttpRequest(), function(request) {
-    request.open(type.toUpperCase(), url, true);
-    if (options.then) {
-      request.onreadystatechange = function() {
-        if (request.readyState !== 4) return;
-        options.then(requestSuccess(request), request.responseText, request);
-      }
-    } else {
-      request.onreadystatechange = function() {
-        if (request.readyState !== 4) return;
-        var success = requestSuccess(request);
-        if (success && options.success) {
-          options.success(request.responseText, request);
-        } else if (options.error) {
-          options.error(request.statusText, request);
-        }
-      }
+    request.open(type.toUpperCase(), _.isString(options) ? options : options.url, true);
+    request.onreadystatechange = function() {
+      if (request.readyState !== 4) return;
+      func(!requestSuccess(request), request.responseText, request);
     }
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
     _.forEach(options.header || {}, function(value, key) {
@@ -59,9 +54,7 @@ function ajax(type, url, options) {
     });
     request.send(options.data || "");
   });
-};
-
-u.ajax = _.curry(ajax);
+});
 
 u.get = u.ajax('get');
 u.post = u.ajax('post');

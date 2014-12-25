@@ -10,8 +10,15 @@ function get(f, x) {
   return _.isFunction(f) ? f(x) : f;
 }
 
-/* Local variable for the `lodash` or `underscore-contrib` curry function. */
+/* Local variable for the Lo-Dash or Underscore-Contrib curry function. */
 var curry = _.curry;
 
 /* Test node for feature checking */
 var testNode = d.createElement('div');
+
+/* Underscore/Lo-Dash mixins */
+// _.mixin({
+//   concat: function() {
+//     return Array.prototype.concat.apply([], arguments);
+//   }
+// });
