@@ -10,7 +10,7 @@ var del = require('del');
 
 var config = {
   src: [
-    'src/modules/utilities/**/*.js',
+    'src/modules/*.js',
     'src/modules/node/**/*.js',
     'src/modules/collection/**/*.js'
   ],
