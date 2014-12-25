@@ -1,0 +1,13 @@
+html {
+  background: #111;
+  color: #ffc31c;
+  font: 300 16px/1.5 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 2rem;
+}
+
+a, a:visited, a:hover, a:active {
+  color: inherit;
+}

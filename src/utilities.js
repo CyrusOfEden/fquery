@@ -15,10 +15,3 @@ var curry = _.curry;
 
 /* Test node for feature checking */
 var testNode = d.createElement('div');
-
-/* Underscore/Lo-Dash mixins */
-// _.mixin({
-//   concat: function() {
-//     return Array.prototype.concat.apply([], arguments);
-//   }
-// });
