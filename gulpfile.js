@@ -7,58 +7,63 @@ var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var wrap = require('gulp-wrap');
 
-var config = {
-  src: [
-    'src/utilities.js',
-    'src/node/**/*.js',
-    'src/collection/**/*.js'
-  ],
-  dist: 'dist/',
-  template: 'src/template.js',
-  test: {
-    dist: 'test/',
-    src: ['tests/**/*.js'],
-    template: 'test/template.js'
-  },
+var CONFIG = {
   build: {
-    dev: 'fquery.js',
-    min: 'fquery.min.js',
-    test: 'fquery.test.js'
+    src: [
+      'src/utilities.js',
+      'src/node/**/*.js',
+      'src/collection/**/*.js'
+    ],
+    dist: 'dist/',
+    template: 'src/template.js',
+    out: {
+      dev: 'fquery.js',
+      min: 'fquery.min.js'
+    }
+  },
+  test: {
+    src: [
+      'test/utilities.js',
+      'test/node/**/*.js',
+      'test/collection/**/*.js'
+    ],
+    dist: 'test/dist/',
+    template: 'test/template.js',
+    out: {
+      dev: 'test.js'
+    }
   }
 };
 
-gulp.task('build', function() {
-  gulp.src(config.src).
-    pipe(plumber()).
-    pipe(concat(config.build.dev)).
-    pipe(wrap({ src: config.template })).
-    pipe(validate()).
-    pipe(gulp.dest(config.dist));
-});
-
 gulp.task('minify', function() {
-  gulp.src(config.dist + config.build.dev).
+  var config = CONFIG.build;
+  gulp.src(config.dist + config.out.dev).
     pipe(plumber()).
     pipe(uglify()).
-    pipe(rename(config.build.min)).
+    pipe(rename(config.out.min)).
     pipe(gulp.dest(config.dist));
 });
 
 gulp.task('prep-test', function() {
-  gulp.src(config.dist + config.outdev).
-    pipe(gulp.dest(config.test.dist));
-
-  gulp.src(config.test.src).
-    pipe(concat(config.build.test)).
-    pipe(wrap({ src: config.test.template })).
-    pipe(validate()).
-    pipe(gulp.dest(config.test.dist));
+  var build = CONFIG.build,
+      test = CONFIG.test;
+  gulp.src(build.dist + build.out.dev).
+    pipe(gulp.dest(test.dist));
 });
 
-gulp.task('test', function() {
-  gulp.watch(config.test.src, ['prep-test']);
+['build', 'test'].forEach(function(task) {
+  gulp.task(task, function() {
+    var config = CONFIG[task];
+    gulp.src(config.src).
+      pipe(plumber()).
+      pipe(concat(config.out.dev)).
+      pipe(wrap({ src: config.template })).
+      pipe(validate()).
+      pipe(gulp.dest(config.dist));
+  });
 });
 
-gulp.task('default', function() {
-  gulp.watch(config.src, ['build', 'minify']);
+gulp.task('ci', function() {
+  var src = CONFIG.build.src.concat(CONFIG.test.src);
+  gulp.watch(src, ['build', 'minify', 'prep-test', 'test']);
 });
