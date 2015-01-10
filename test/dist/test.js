@@ -164,8 +164,60 @@ suite("Class", function() {
     });
   });
 });
+suite("CSS", function() {
+  var elem = n.q('#css');
 
+  suite('setStyle / getStyle', function() {
+    test('set a style / get a style', function() {
+      var color = n.getStyle('color', n.q('.google-link'));
+      n.setStyle('backgroundColor', color, elem);
+      assert.equal(color, n.getStyle('backgroundColor', elem));
+    });
+  });
+});
+suite("Data", function() {
+  var elem = n.q('.google-link');
 
+  suite("setData / getData", function() {
+    test("set data-attr / get data-attr", function() {
+      var prop = 'clicks-count';
+      n.setData(prop, 0, elem);
+      n.setData(prop, 1, elem);
+      assert.equal('1', n.getData(prop, elem));
+    });
+  });
+
+  suite("removeData", function() {
+    test("remove data-attr", function() {
+      var prop = 'clicks-count';
+      n.removeData(prop, elem);
+      assert.falsy(n.getData(prop, elem));
+    });
+  });
+});
+
+suite("Event", function() {
+  var elem = n.q('.google-link');
+
+  suite("Watch, trigger, unwatch", function() {
+    test("Watching an event, triggering it, and unwatching it", function() {
+      var prop = 'click-count',
+          unwatch;
+      n.setData(prop, 0, elem);
+      unwatch = n.watch('click', function(event, node) {
+        event.preventDefault();
+        console.log("CLICKED");
+        n.setData(prop, function(node) {
+          return _.parseInt(n.getData(prop, node)) + 1;
+        }, node);
+        return false;
+      });
+      // n.trigger('click', elem);
+      unwatch();
+      assert.equal('1', n.getData(prop, elem));
+    });
+  });
+});
 
     console.log("\n");
     console.timeEnd(name);

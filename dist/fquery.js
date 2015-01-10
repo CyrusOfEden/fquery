@@ -105,25 +105,27 @@ n.getClass = function(node) {
   return _.toArray(node.classList);
 };
 
-// Get the computed styling of a node.
 /**
- * @param {String} property - the CSS property
+ * Get the computed styling of a node.
+ *
+ * @param {String} prop - the CSS property to fetch
  * @param {Element} node - the node
  * @returns {Any} the value of the node's CSS property
  */
-n.getStyle = function(property, node) {
-  return getComputedStyle(node)[property];
+n.getStyle = function(prop, node) {
+  return getComputedStyle(node)[prop];
 };
 
-// Set the CSS style of a node.
 /**
- * @param {String} property - the CSS property
- * @param {Any} value - the new value of the CSS property
+ * Set the CSS style of a node.
+ *
+ * @param {String} prop - the property to modify
+ * @param {Any} value - the value to set
  * @param {Element} node - the node
  * @returns {Element} the node
  */
-n.setStyle = function(property, value, node) {
-  node.style[property] = get(value, node);
+n.setStyle = function(prop, value, node) {
+  node.style[prop] = get(value, node);
   return node;
 };
 
@@ -197,7 +199,7 @@ n.watch = function(name, func, node) {
  */
 n.trigger = function(name, node) {
   var event = d.createEvent('HTMLEvents');
-  event.initEvent(name, true, false);
+  event.initEvent(name, true, true);
   node.dispatchEvent(event);
   return node;
 };
