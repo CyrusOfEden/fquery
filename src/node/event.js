@@ -37,7 +37,7 @@ n.watch = function(name, func, node) {
  */
 n.trigger = function(name, node) {
   var event = d.createEvent('HTMLEvents');
-  event.initEvent(name, true, false);
+  event.initEvent(name, true, true);
   node.dispatchEvent(event);
   return node;
 };
