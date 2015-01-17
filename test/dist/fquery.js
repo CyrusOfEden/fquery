@@ -30,6 +30,16 @@ var curry = _.curry;
 var testNode = d.createElement('div');
 
 /**
+ * Capitalize a string
+ *
+ * @param  {String} string - the string to capitalize
+ * @return {String} the capitalized string
+ */
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
  * Returns an attribute of an `Element`.
  * For example, the `type` attribute on `input` elements.
  *
@@ -75,9 +85,7 @@ n.removeAttr = function(attr, node) {
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, function(klass) {
-      node.classList[func](klass);
-    });
+    _.forEach(klasses, node.classList[func]);
     return node;
   };
 });
@@ -104,6 +112,9 @@ n.hasClass = function(klasses, node) {
 n.getClass = function(node) {
   return _.toArray(node.classList);
 };
+
+/* Alias `addClass` to `setClass` */
+n.setClass = n.addClass;
 
 /**
  * Get the computed styling of a node.
@@ -339,12 +350,14 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {String} text - the text content of the new node
+ * @param {Object} opts - functions + parameters to call to configure the element
  * @returns {Element} the new node
  */
-n.node = function(tag, text) {
+n.node = function(tag, opts) {
   var node = d.createElement(tag);
-  node.appendChild(_.isString(text) ? d.createTextNode(text) : text);
+  _.forEach(opts, function(params, func) {
+    n['set' + capitalize(func)].apply(null, params.concat(node));
+  });
   return node;
 };
 

@@ -23,12 +23,14 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {String} text - the text content of the new node
+ * @param {Object} opts - functions + parameters to call to configure the element
  * @returns {Element} the new node
  */
-n.node = function(tag, text) {
+n.node = function(tag, opts) {
   var node = d.createElement(tag);
-  node.appendChild(_.isString(text) ? d.createTextNode(text) : text);
+  _.forEach(opts, function(params, func) {
+    n['set' + capitalize(func)].apply(null, params.concat(node));
+  });
   return node;
 };
 

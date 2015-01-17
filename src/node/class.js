@@ -7,9 +7,7 @@
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, function(klass) {
-      node.classList[func](klass);
-    });
+    _.forEach(klasses, node.classList[func]);
     return node;
   };
 });
@@ -36,3 +34,6 @@ n.hasClass = function(klasses, node) {
 n.getClass = function(node) {
   return _.toArray(node.classList);
 };
+
+/* Alias `addClass` to `setClass` */
+n.setClass = n.addClass;

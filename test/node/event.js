@@ -4,9 +4,9 @@ suite("Event", function() {
   suite("Watch, trigger, unwatch", function() {
     test("Watching an event, triggering it, and unwatching it", function() {
       var prop = 'click-count',
-          unwatch;
+          trackClicks, unwatch;
       n.setData(prop, 0, elem);
-      unwatch = n.watch('click', function(event, node) {
+      trackClicks = n.watch('click', function(event, node) {
         event.preventDefault();
         console.log("CLICKED");
         n.setData(prop, function(node) {
@@ -14,7 +14,8 @@ suite("Event", function() {
         }, node);
         return false;
       });
-      // n.trigger('click', elem);
+      unwatch = trackClicks(elem);
+      n.trigger('click', elem);
       unwatch();
       assert.equal('1', n.getData(prop, elem));
     });

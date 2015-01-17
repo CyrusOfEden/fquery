@@ -15,3 +15,13 @@ var curry = _.curry;
 
 /* Test node for feature checking */
 var testNode = d.createElement('div');
+
+/**
+ * Capitalize a string
+ *
+ * @param  {String} string - the string to capitalize
+ * @return {String} the capitalized string
+ */
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
