@@ -85,7 +85,7 @@ n.removeAttr = function(attr, node) {
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, node.classList[func]);
+    _.forEach(klasses, function(klass) { node.classList[func](klass) });
     return node;
   };
 });
