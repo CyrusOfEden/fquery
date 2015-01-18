@@ -19,7 +19,7 @@ var testNode = d.createElement('div');
 /**
  * Capitalize a string
  *
- * @param  {String} string - the string to capitalize
+ * @param {String} string - the string to capitalize
  * @return {String} the capitalized string
  */
 function capitalize(string) {

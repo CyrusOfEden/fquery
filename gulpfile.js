@@ -11,6 +11,7 @@ var CONFIG = {
   build: {
     src: [
       'src/utilities.js',
+      'src/stack.js',
       'src/node/**/*.js',
       'src/collection/**/*.js'
     ],

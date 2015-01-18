@@ -13,6 +13,14 @@
   document.addEventListener('DOMContentLoaded', function() {
     console.time(name);
 
+function bench(name, count, func) {
+  console.time(name);
+  while (count--) func();
+  console.timeEnd(name);
+}
+
+_.extend(window, { bench: bench });
+
 function AssertionError(message) {
   this.name = "AssertionError";
   this.message = (message || '');
@@ -37,7 +45,7 @@ function test(feature, func) {
     feature = '';
   }
   try {
-    func()
+    func();
     pass.push(feature);
     console.log('%c' + feature, styles.pass);
   } catch (e) {
@@ -86,10 +94,6 @@ suite("Attributes", function() {
   suite("getAttr", function() {
     test("get an attribute", function() {
       assert.equal(n.getAttr('href', elem), 'http://google.ca');
-    });
-
-    test("handle an empty attribute", function() {
-      assert.falsy(n.getAttr('style', elem));
     });
   });
 

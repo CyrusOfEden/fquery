@@ -32,12 +32,16 @@ var testNode = d.createElement('div');
 /**
  * Capitalize a string
  *
- * @param  {String} string - the string to capitalize
+ * @param {String} string - the string to capitalize
  * @return {String} the capitalized string
  */
 function capitalize(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+n.detach = n.stack = function(node, func) {
+  n.replace(node, func(n.clone(node)));
+};
 
 /**
  * Returns an attribute of an `Element`.
@@ -48,7 +52,7 @@ function capitalize(string) {
  * @returns {String} the value of the attribute
  */
 n.getAttr = function(attr, node) {
-  return (node.getAttribute(attr) || '').trim();
+  return node.getAttribute(attr);
 };
 
 /**
@@ -337,6 +341,18 @@ n.remove = function(node) {
 };
 
 /**
+ * Replace a node with a node
+ *
+ * @param {Element} oldNode - the node to replace
+ * @param {Element} newNode - the node that's replacing
+ * @return {Element} the new node
+ */
+n.replace = function(oldNode, newNode) {
+  oldNode.parentNode.replaceChild(newNode, oldNode);
+  return newNode;
+};
+
+/**
  * Return a copy of a node.
  *
  * @param {Element} node - the node
@@ -353,11 +369,9 @@ n.clone = function(node) {
  * @param {Object} opts - functions + parameters to call to configure the element
  * @returns {Element} the new node
  */
-n.node = function(tag, opts) {
+n.node = function(tag, funcs) {
   var node = d.createElement(tag);
-  _.forEach(opts, function(params, func) {
-    n['set' + capitalize(func)].apply(null, params.concat(node));
-  });
+  _.forEach(funcs, function(func) { func(node) });
   return node;
 };
 

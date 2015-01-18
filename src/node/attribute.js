@@ -7,7 +7,7 @@
  * @returns {String} the value of the attribute
  */
 n.getAttr = function(attr, node) {
-  return (node.getAttribute(attr) || '').trim();
+  return node.getAttribute(attr);
 };
 
 /**

@@ -5,10 +5,6 @@ suite("Attributes", function() {
     test("get an attribute", function() {
       assert.equal(n.getAttr('href', elem), 'http://google.ca');
     });
-
-    test("handle an empty attribute", function() {
-      assert.falsy(n.getAttr('style', elem));
-    });
   });
 
   suite("setAttr", function() {
