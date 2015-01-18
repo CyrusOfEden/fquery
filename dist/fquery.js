@@ -636,7 +636,7 @@ n.removeProp = function(prop, node) {
  * @returns {Element} the text content of the node
  */
 n.getText = function(node) {
-  return (node.textContent || '').trim();
+  return node.textContent.trim();
 };
 
 /**
