@@ -13,14 +13,6 @@
   document.addEventListener('DOMContentLoaded', function() {
     console.time(name);
 
-function bench(name, count, func) {
-  console.time(name);
-  while (count--) func();
-  console.timeEnd(name);
-}
-
-_.extend(window, { bench: bench });
-
 function AssertionError(message) {
   this.name = "AssertionError";
   this.message = (message || '');
@@ -210,7 +202,6 @@ suite("Event", function() {
       n.setData(prop, 0, elem);
       trackClicks = n.watch('click', function(event, node) {
         event.preventDefault();
-        console.log("CLICKED");
         n.setData(prop, function(node) {
           return _.parseInt(n.getData(prop, node)) + 1;
         }, node);
@@ -227,7 +218,7 @@ suite("Event", function() {
     console.log("\n");
     console.timeEnd(name);
 
-    var style = styles[fail.length === 0 ? 'pass' : 'fail'];
+    var style = styles[fail.length ? 'fail' : 'pass'];
 
     console.log("%c" + pass.length + " passes, " + fail.length + " failures.", style);
     console.log("%c" + fail.join(', '), style);

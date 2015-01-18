@@ -9,7 +9,7 @@
 function buildCallback(func, node) {
   return function(event) {
     return func(event, node);
-  }
+  };
 }
 
 /**
@@ -25,7 +25,7 @@ n.watch = function(name, func, node) {
   node.addEventListener(name, func);
   return function() {
     return node.removeEventListener(name, func);
-  }
+  };
 };
 
 /**

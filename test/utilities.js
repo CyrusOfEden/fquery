@@ -1,11 +1,3 @@
-function bench(name, count, func) {
-  console.time(name);
-  while (count--) func();
-  console.timeEnd(name);
-}
-
-_.extend(window, { bench: bench });
-
 function AssertionError(message) {
   this.name = "AssertionError";
   this.message = (message || '');

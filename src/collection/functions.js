@@ -1,10 +1,16 @@
+var exceptions = ['q', 'tap'];
+
+function include(name) {
+  return !_.include(exceptions, name);
+}
+
 /**
  * Adapt all of `n`'s  functions for use with collections
  * (using the `c` namespace), and curry everything.
  */
 _.forEach(n, function(func, name) {
   // Don't run for the `q` function
-  if (name !== 'q') {
+  if (include(name)) {
     c[name] = curry(function() {
       var args = _.initial(arguments),
           collection = _.last(arguments);

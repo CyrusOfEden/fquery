@@ -8,7 +8,6 @@ suite("Event", function() {
       n.setData(prop, 0, elem);
       trackClicks = n.watch('click', function(event, node) {
         event.preventDefault();
-        console.log("CLICKED");
         n.setData(prop, function(node) {
           return _.parseInt(n.getData(prop, node)) + 1;
         }, node);

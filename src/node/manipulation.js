@@ -1,4 +1,15 @@
 /**
+ * Detach a node from the DOM, perform updates, then replace the original node
+ *
+ * @param {Element} node - the node to perform actions on
+ * @param {Function} func - function that is passed the cloned node. must return a node.
+ * @return {Element} the replaced node
+ */
+n.tap = function(node, func) {
+  n.replace(node, func(n.clone(node)));
+};
+
+/**
  * Remove a node.
  *
  * @param {Element} node - the node

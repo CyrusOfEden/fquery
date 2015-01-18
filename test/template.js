@@ -18,7 +18,7 @@
     console.log("\n");
     console.timeEnd(name);
 
-    var style = styles[fail.length === 0 ? 'pass' : 'fail'];
+    var style = styles[fail.length ? 'fail' : 'pass'];
 
     console.log("%c" + pass.length + " passes, " + fail.length + " failures.", style);
     console.log("%c" + fail.join(', '), style);

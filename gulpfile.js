@@ -11,7 +11,6 @@ var CONFIG = {
   build: {
     src: [
       'src/utilities.js',
-      'src/stack.js',
       'src/node/**/*.js',
       'src/collection/**/*.js'
     ],
@@ -65,6 +64,6 @@ gulp.task('prep-test', function() {
 });
 
 gulp.task('ci', function() {
-  var src = CONFIG.build.src.concat(CONFIG.test.src);
-  gulp.watch(src, ['build', 'minify', 'prep-test', 'test']);
+  gulp.watch(CONFIG.build.src, ['build', 'minify', 'prep-test']);
+  gulp.watch(CONFIG.test.src, ['test']);
 });

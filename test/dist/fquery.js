@@ -30,20 +30,6 @@ var curry = _.curry;
 var testNode = d.createElement('div');
 
 /**
- * Capitalize a string
- *
- * @param {String} string - the string to capitalize
- * @return {String} the capitalized string
- */
-function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-n.detach = n.stack = function(node, func) {
-  n.replace(node, func(n.clone(node)));
-};
-
-/**
  * Returns an attribute of an `Element`.
  * For example, the `type` attribute on `input` elements.
  *
@@ -186,7 +172,7 @@ n.removeData = function(attr, node) {
 function buildCallback(func, node) {
   return function(event) {
     return func(event, node);
-  }
+  };
 }
 
 /**
@@ -202,7 +188,7 @@ n.watch = function(name, func, node) {
   node.addEventListener(name, func);
   return function() {
     return node.removeEventListener(name, func);
-  }
+  };
 };
 
 /**
@@ -327,6 +313,17 @@ n.outerHeight = function(node) {
  */
 n.outerWidth = function(node) {
   return node.offsetWidth;
+};
+
+/**
+ * Detach a node from the DOM, perform updates, then replace the original node
+ *
+ * @param {Element} node - the node to perform actions on
+ * @param {Function} func - function that is passed the cloned node. must return a node.
+ * @return {Element} the replaced node
+ */
+n.tap = function(node, func) {
+  n.replace(node, func(n.clone(node)));
 };
 
 /**
@@ -721,13 +718,19 @@ c.q = function(s, c) {
   }
 };
 
+var exceptions = ['q', 'tap'];
+
+function include(name) {
+  return !_.include(exceptions, name);
+}
+
 /**
  * Adapt all of `n`'s  functions for use with collections
  * (using the `c` namespace), and curry everything.
  */
 _.forEach(n, function(func, name) {
   // Don't run for the `q` function
-  if (name !== 'q') {
+  if (include(name)) {
     c[name] = curry(function() {
       var args = _.initial(arguments),
           collection = _.last(arguments);
