@@ -71,11 +71,11 @@ n.removeAttr = function(attr, node) {
  *
  * @param {Array<String>} klasses - classes to add/remove/toggle
  * @param {Element} node - the element to modify
- * @returns {Element} node
+ * @returns {Element} the node
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, function(klass) { node.classList[func](klass) });
+    _.forEach(klasses, function(klass) { node.classList[func](klass); });
     return node;
   };
 });
@@ -103,8 +103,18 @@ n.getClass = function(node) {
   return _.toArray(node.classList);
 };
 
-/* Alias `addClass` to `setClass` */
-n.setClass = n.addClass;
+/**
+ * Set an `Element`'s classes
+ *
+ * @param {Array<String>} klasses - the classes to set
+ * @param {Element} node - the node to modify
+ * @returns {Element} the node
+ */
+n.setClass = function(klasses, node) {
+  n.removeClass(n.getClass(node), node);
+  n.addClass(klasses, node);
+  return node;
+};
 
 /**
  * Get the computed styling of a node.
@@ -363,13 +373,11 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {Object} opts - functions + parameters to call to configure the element
+ * @param {Function} func - function to modify the node, must return the node
  * @returns {Element} the new node
  */
-n.node = function(tag, funcs) {
-  var node = d.createElement(tag);
-  _.forEach(funcs, function(func) { func(node) });
-  return node;
+n.node = function(tag, func) {
+  return func(d.createElement(tag));
 };
 
 /**
@@ -600,7 +608,11 @@ n.tagMatch = function(tag, node) {
  * @returns {Element} the passed through `s` or the element (or null)
  */
 n.q = function(s, n) {
-  return (s instanceof Element || s instanceof Text) ? s : (n || d).querySelector(s);
+  if (s instanceof Element || s instanceof Text) {
+    return s;
+  } else {
+    return (n || d).querySelector(s);
+  }
 };
 
 /**

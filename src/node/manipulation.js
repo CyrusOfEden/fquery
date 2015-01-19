@@ -46,13 +46,11 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {Object} opts - functions + parameters to call to configure the element
+ * @param {Function} func - function to modify the node, must return the node
  * @returns {Element} the new node
  */
-n.node = function(tag, funcs) {
-  var node = d.createElement(tag);
-  _.forEach(funcs, function(func) { func(node) });
-  return node;
+n.node = function(tag, func) {
+  return func(d.createElement(tag));
 };
 
 /**

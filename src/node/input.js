@@ -14,5 +14,5 @@ n.getValue = function(node) {
  * @returns {Element} the node
  */
 n.setValue = function(value, node) {
-  return n.setProp('value', value, node);
+  return n.setProp('value', get(value, node), node);
 };

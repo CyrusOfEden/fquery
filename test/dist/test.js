@@ -81,11 +81,12 @@ var assert = {
 };
 
 suite("Attributes", function() {
-  var elem = n.q('.google-link');
+  var elem = n.q('.google-link'),
+      $elem = $('.google-link');
 
   suite("getAttr", function() {
     test("get an attribute", function() {
-      assert.equal(n.getAttr('href', elem), 'http://google.ca');
+      assert.equal(n.getAttr('href', elem), $elem.attr('href'));
     });
   });
 
@@ -93,69 +94,71 @@ suite("Attributes", function() {
     test("set an attribute", function() {
       var altText = "A link to Google";
       n.setAttr('alt', altText, elem);
-      assert.equal(n.getAttr('alt', elem), altText);
+      assert.equal($elem.attr('alt'), altText);
     });
   });
 
   suite("removeAttr", function() {
     test("remove an attribute", function() {
       n.removeAttr('alt', elem);
-      assert.falsy(n.getAttr('alt', elem));
+      assert.falsy($elem.attr('alt'));
     });
   });
 });
 
 suite("Class", function() {
-  var elem = n.q('#class');
+  var elem = n.q('#class'),
+      $elem = $('#class');
 
   suite('addClass', function() {
     test('add a class', function() {
-      var tempClasses = ['temp'];
-      n.addClass(tempClasses, elem);
-      assert.truthy(n.hasClass(tempClasses, elem));
+      n.addClass(['temp'], elem);
+      assert.truthy($elem.hasClass('temp'));
     });
     test('add multiple classes', function() {
-      var tempClasses = ['a', 'b', 'c'];
-      n.addClass(tempClasses, elem);
-      assert.truthy(n.hasClass(tempClasses, elem));
+      n.addClass(['a', 'b', 'c'], elem);
+      assert.truthy($elem.hasClass('a'));
+      assert.truthy($elem.hasClass('b'));
+      assert.truthy($elem.hasClass('c'));
     });
   });
 
   suite('removeClass', function() {
     test('remove a class', function() {
-      var tempClasses = ['temp'];
-      n.removeClass(tempClasses, elem);
-      assert.falsy(n.hasClass(tempClasses, elem));
+      n.removeClass(['temp'], elem);
+      assert.falsy($elem.hasClass('temp'));
     });
     test('remove multiple classes', function() {
-      var tempClasses = ['a', 'b', 'c'];
-      n.removeClass(tempClasses, elem);
-      assert.falsy(n.hasClass(tempClasses, elem));
+      n.removeClass(['a', 'b', 'c'], elem);
+      assert.falsy($elem.hasClass('a'));
+      assert.falsy($elem.hasClass('b'));
+      assert.falsy($elem.hasClass('c'));
     });
   });
 
   suite('toggleClass', function() {
     test('toggling classes', function() {
       var tempClasses = ['a', 'b', 'c'];
-      n.addClass(tempClasses.slice(1), elem);
+      $elem.addClass('a');
+      $elem.addClass('b');
       n.toggleClass(tempClasses, elem);
-      assert.truthy(n.hasClass([tempClasses[0]], elem));
-      assert.falsy(n.hasClass(tempClasses.slice(1), elem));
+      assert.truthy($elem.hasClass('c'));
+      assert.falsy($elem.hasClass('b'));
+      assert.falsy($elem.hasClass('a'));
     });
   });
 
   suite('hasClass', function() {
     test("check classes", function() {
-      var tempClasses = ['a'];
-      n.addClass(tempClasses, elem);
-      assert.truthy(n.hasClass(tempClasses, elem));
+      $elem.addClass('a');
+      assert.truthy(n.hasClass(['a'], elem));
     });
   });
 
   suite('getClass', function() {
     test("get class list", function() {
-      var tempClasses = ['a'];
-      n.removeClass(tempClasses, elem);
+      $elem.removeClass('a');
+      $elem.removeClass('c');
       assert.equal(n.getClass(elem), []);
     });
   });
@@ -214,6 +217,35 @@ suite("Event", function() {
     });
   });
 });
+suite("HTML", function() {
+  var elem = n.q('#html p'),
+      $elem = $('#html p'),
+      content;
+
+  suite("innerHTML", function() {
+    test("get innerHTML of an element", function() {
+      content = n.getInnerHTML(elem);
+      assert.equal(content, $elem.html());
+    });
+    test("set innerHTML of an element", function() {
+      var html = "<strong>One flew over the cuckoo's nest</strong>";
+      n.setInnerHTML(html, elem);
+      assert.equal(html, $elem.html());
+    });
+  });
+
+  suite("outerHTML", function() {
+    test("get outerHTML of an element", function() {
+      assert.equal(n.getOuterHTML(elem), elem.outerHTML);
+    });
+    test("set outerHTML of an element", function() {
+      var html = '<p>' + content + '</p>';
+      n.setOuterHTML(html, elem);
+      assert.equal(n.getOuterHTML(elem), elem.outerHTML);
+    });
+  });
+});
+
 
     console.log("\n");
     console.timeEnd(name);

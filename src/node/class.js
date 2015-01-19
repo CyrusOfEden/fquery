@@ -3,11 +3,11 @@
  *
  * @param {Array<String>} klasses - classes to add/remove/toggle
  * @param {Element} node - the element to modify
- * @returns {Element} node
+ * @returns {Element} the node
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, function(klass) { node.classList[func](klass) });
+    _.forEach(klasses, function(klass) { node.classList[func](klass); });
     return node;
   };
 });
@@ -35,5 +35,15 @@ n.getClass = function(node) {
   return _.toArray(node.classList);
 };
 
-/* Alias `addClass` to `setClass` */
-n.setClass = n.addClass;
+/**
+ * Set an `Element`'s classes
+ *
+ * @param {Array<String>} klasses - the classes to set
+ * @param {Element} node - the node to modify
+ * @returns {Element} the node
+ */
+n.setClass = function(klasses, node) {
+  n.removeClass(n.getClass(node), node);
+  n.addClass(klasses, node);
+  return node;
+};

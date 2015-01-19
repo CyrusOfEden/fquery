@@ -11,3 +11,7 @@ body {
 a, a:visited, a:hover, a:active {
   color: inherit;
 }
+
+strong {
+  font-weight: 500;
+}

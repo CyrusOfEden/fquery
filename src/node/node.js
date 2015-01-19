@@ -6,5 +6,9 @@
  * @returns {Element} the passed through `s` or the element (or null)
  */
 n.q = function(s, n) {
-  return (s instanceof Element || s instanceof Text) ? s : (n || d).querySelector(s);
+  if (s instanceof Element || s instanceof Text) {
+    return s;
+  } else {
+    return (n || d).querySelector(s);
+  }
 };
