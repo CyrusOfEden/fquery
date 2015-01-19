@@ -24,18 +24,18 @@ var matcher = _.find([
 /**
  * Check if a node matches a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */
 n.matches = function(s, node) {
-  return node[matcher](s);
+  return node[matcher](s, node);
 };
 
 /**
  * Check if a node doesn't matches a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */
@@ -46,7 +46,7 @@ n.not = function(s, node) {
 /**
  * Check if a node has any descendents matching a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */

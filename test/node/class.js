@@ -1,6 +1,6 @@
 suite("Class", function() {
   var elem = n.q('#class'),
-      $elem = $('#class');
+      $elem = $(elem);
 
   suite('addClass', function() {
     test('add a class', function() {

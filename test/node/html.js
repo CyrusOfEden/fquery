@@ -1,6 +1,6 @@
 suite("HTML", function() {
   var elem = n.q('#html p'),
-      $elem = $('#html p'),
+      $elem = $(elem),
       content;
 
   suite("innerHTML", function() {

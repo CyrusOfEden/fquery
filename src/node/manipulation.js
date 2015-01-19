@@ -2,11 +2,11 @@
  * Detach a node from the DOM, perform updates, then replace the original node
  *
  * @param {Element} node - the node to perform actions on
- * @param {Function} func - function that is passed the cloned node. must return a node.
+ * @param {Object<String, Array> || Function} funcs - keys matching functions, values being arguments array
  * @return {Element} the replaced node
  */
-n.tap = function(node, func) {
-  n.replace(node, func(n.clone(node)));
+n.tap = function(node, funcs) {
+  return n.replace(node, apply(n.clone(node), funcs));
 };
 
 /**
@@ -46,11 +46,11 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {Function} func - function to modify the node, must return the node
+ * @param {Object<String, Array> || Function} funcs - keys matching functions, values being arguments array
  * @returns {Element} the new node
  */
-n.node = function(tag, func) {
-  return func(d.createElement(tag));
+n.node = function(tag, funcs) {
+  return apply(d.createElement(tag), funcs);
 };
 
 /**

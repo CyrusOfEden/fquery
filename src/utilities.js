@@ -10,6 +10,25 @@ function get(f, x) {
   return _.isFunction(f) ? f(x) : f;
 }
 
+/**
+ * Apply object-style funcs or a function to a node
+ *
+ * @private
+ * @param {Element} node - the node
+ * @param {Object<String, Array> || Function} funcs
+ * @returns {Element} the node, with updates applied
+ */
+function apply(node, funcs) {
+  if (_.isFunction(funcs)) {
+    funcs(node);
+  } else {
+    _.forEach(funcs, function(args, func) {
+      n[func].apply(null, args.concat(node));
+    });
+  }
+  return node;
+}
+
 /* Local variable for the Lo-Dash or Underscore-Contrib curry function. */
 var curry = _.curry;
 

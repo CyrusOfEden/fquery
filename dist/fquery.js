@@ -23,6 +23,25 @@ function get(f, x) {
   return _.isFunction(f) ? f(x) : f;
 }
 
+/**
+ * Apply object-style funcs or a function to a node
+ *
+ * @private
+ * @param {Element} node - the node
+ * @param {Object<String, Array> || Function} funcs
+ * @returns {Element} the node, with updates applied
+ */
+function apply(node, funcs) {
+  if (_.isFunction(funcs)) {
+    funcs(node);
+  } else {
+    _.forEach(funcs, function(args, func) {
+      n[func].apply(null, args.concat(node));
+    });
+  }
+  return node;
+}
+
 /* Local variable for the Lo-Dash or Underscore-Contrib curry function. */
 var curry = _.curry;
 
@@ -329,11 +348,11 @@ n.outerWidth = function(node) {
  * Detach a node from the DOM, perform updates, then replace the original node
  *
  * @param {Element} node - the node to perform actions on
- * @param {Function} func - function that is passed the cloned node. must return a node.
+ * @param {Object<String, Array> || Function} funcs - keys matching functions, values being arguments array
  * @return {Element} the replaced node
  */
-n.tap = function(node, func) {
-  n.replace(node, func(n.clone(node)));
+n.tap = function(node, funcs) {
+  return n.replace(node, apply(n.clone(node), funcs));
 };
 
 /**
@@ -373,11 +392,11 @@ n.clone = function(node) {
  * Create a new node.
  *
  * @param {String} tag - the HTML tag of the new node
- * @param {Function} func - function to modify the node, must return the node
+ * @param {Object<String, Array> || Function} funcs - keys matching functions, values being arguments array
  * @returns {Element} the new node
  */
-n.node = function(tag, func) {
-  return func(d.createElement(tag));
+n.node = function(tag, funcs) {
+  return apply(d.createElement(tag), funcs);
 };
 
 /**
@@ -465,18 +484,18 @@ var matcher = _.find([
 /**
  * Check if a node matches a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */
 n.matches = function(s, node) {
-  return node[matcher](s);
+  return node[matcher](s, node);
 };
 
 /**
  * Check if a node doesn't matches a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */
@@ -487,7 +506,7 @@ n.not = function(s, node) {
 /**
  * Check if a node has any descendents matching a selector.
  *
- * @param {Any} s - the selector
+ * @param {String} s - the selector
  * @param {Element} node - the node
  * @returns {Boolean} whether the node has any descendents matching the selector
  */
@@ -624,7 +643,7 @@ n.q = function(s, n) {
  * @returns {String} the value of the property
  */
 n.getProp = function(prop, node) {
-  return (node[prop] || '').trim();
+  return node[prop].trim();
 };
 
 /**
@@ -682,10 +701,8 @@ n.setText = function(value, node) {
  */
 n.siblings = function(node) {
   var siblings = [];
-  for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
-    if (n.nodeType === 1 && n !== node) {
-      siblings.push(n);
-    }
+  for (var e = node.parentNode.firstChild; e; e = e.nextSibling) {
+    if (e.nodeType === 1 && e !== node) siblings.push(e);
   }
   return siblings;
 };

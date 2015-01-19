@@ -6,10 +6,8 @@
  */
 n.siblings = function(node) {
   var siblings = [];
-  for (var n = node.parentNode.firstChild; n; n = n.nextSibling) {
-    if (n.nodeType === 1 && n !== node) {
-      siblings.push(n);
-    }
+  for (var e = node.parentNode.firstChild; e; e = e.nextSibling) {
+    if (e.nodeType === 1 && e !== node) siblings.push(e);
   }
   return siblings;
 };

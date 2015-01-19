@@ -7,7 +7,7 @@
  * @returns {String} the value of the property
  */
 n.getProp = function(prop, node) {
-  return (node[prop] || '').trim();
+  return node[prop].trim();
 };
 
 /**

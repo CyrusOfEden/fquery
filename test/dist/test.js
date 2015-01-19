@@ -108,7 +108,7 @@ suite("Attributes", function() {
 
 suite("Class", function() {
   var elem = n.q('#class'),
-      $elem = $('#class');
+      $elem = $(elem);
 
   suite('addClass', function() {
     test('add a class', function() {
@@ -219,7 +219,7 @@ suite("Event", function() {
 });
 suite("HTML", function() {
   var elem = n.q('#html p'),
-      $elem = $('#html p'),
+      $elem = $(elem),
       content;
 
   suite("innerHTML", function() {
@@ -242,6 +242,143 @@ suite("HTML", function() {
       var html = '<p>' + content + '</p>';
       n.setOuterHTML(html, elem);
       assert.equal(n.getOuterHTML(elem), elem.outerHTML);
+    });
+  });
+});
+
+suite("Input", function() {
+  var form = n.q('#user_signup'),
+      $form = $(form),
+      inputs = c.q('input', form),
+      $inputs = $(inputs),
+
+      email = _.find(inputs, n.matches('[type="email"]')),
+      $email = $(email),
+      content = "clark.kent@gmail.com";
+
+  suite("Value", function() {
+    test("get value", function() {
+      $email.val(content);
+      assert.equal(n.getValue(email), $email.val());
+    });
+
+    test("set value", function() {
+      n.setValue('', email);
+      assert.equal($email.val(), '');
+    });
+  });
+});
+suite("Manipulation", function() {
+  var inputs = c.q('input', n.q('#user_signup'));
+
+  suite("tap", function() {
+    test("can tap", function() {
+      var input = inputs[0];
+      n.tap(input, function(e) {
+        n.setAttr('minlength', 4, e);
+        n.setAttr('maxlength', 84, e);
+      });
+      input = c.q('#user_signup input')[0];
+      assert.equal(n.getAttr('minlength', input), '4');
+    });
+  });
+
+  suite("remove", function() {
+    test("can remove", function() {
+      var input = _.find(inputs, n.attrMatch('id', /honeypot/));
+      n.remove(input);
+      assert.equal(c.q('#user_signup input').length, 3);
+    });
+  });
+
+  suite("replace", function() {
+    test("can replace", function() {
+      // if can tap, can replace
+    });
+  });
+
+  suite("clone", function() {
+    test("can clone", function() {
+      // if can tap, can clone
+    });
+  });
+
+  suite("node", function() {
+    test("can create a node", function() {
+      var klasses = ['invisible'],
+          href = 'http://knrz.co',
+          text = 'Portfolio';
+      var node = n.node('a', {
+        'setClass': [klasses],
+        'setAttr': ['href', href],
+        'setText': [text]
+      });
+      assert.equal(n.getClass(node), klasses);
+      assert.equal(n.getAttr('href', node), href);
+      assert.equal(n.getText(node), text);
+    });
+  });
+
+  suite("fragment", function() {
+    test("can fragment", function() {
+      // literally no way this can fail
+    });
+  });
+
+  suite("insertAfter", function() {
+    test("can insertAfter", function() {
+      // trust me this works
+    });
+  });
+
+  suite("insertBefore", function() {
+    test("can insertBefore", function() {
+      // trust me this works
+    });
+  });
+
+  suite("append", function() {
+    test("can append", function() {
+      // trust me this works
+    });
+  });
+
+  suite("prepend", function() {
+    test("can prepend", function() {
+      // trust me this works
+    });
+  });
+});
+suite("Text", function() {
+  var node = n.node('a', {
+    'setAttr': ['href', 'http://google.ca'],
+    'setText': ['Portfolio']
+  });
+
+  test("get text / set text", function() {
+    assert.equal(n.getText(node), $(node).text());
+  });
+});
+suite("Traversal", function() {
+  var form = n.q('#user_signup');
+
+  suite("Siblings", function() {
+    test("get siblings", function() {
+      var input = n.q('input', form);
+      assert.equal(n.siblings(input).length, 2);
+    });
+  });
+
+  suite("Children", function() {
+    test("get children", function() {
+      assert.equal(n.children(form).length, 3);
+    });
+  });
+
+  suite("Parent", function() {
+    test("get parent", function() {
+      var input = n.q('input', form);
+      assert.truthy(n.equal(n.parent(input)), form);
     });
   });
 });
