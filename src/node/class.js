@@ -7,7 +7,7 @@
  */
 _.forEach(['add', 'remove', 'toggle'], function(func) {
   n[func + 'Class'] = function(klasses, node) {
-    _.forEach(klasses, function(klass) { node.classList[func](klass); });
+    _.forEach(klasses, node.classList[func].bind(node));
     return node;
   };
 });
@@ -20,9 +20,7 @@ _.forEach(['add', 'remove', 'toggle'], function(func) {
  * @returns {Boolean} the presence of all the classes
  */
 n.hasClass = function(klasses, node) {
-  return _.all(klasses, function(klass) {
-    return node.classList.contains(klass);
-  });
+  return _.all(klasses, node.classList.contains.bind(node));
 };
 
 /**
